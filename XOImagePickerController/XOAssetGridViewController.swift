@@ -58,12 +58,17 @@ class XOAssetGridViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-        self.collectionView.contentInsetAdjustmentBehavior = .always
+        if #available(iOS 11.0, *) {
+            self.collectionView.contentInsetAdjustmentBehavior = .always
+        } else {
+            // Fallback on earlier versions
+        }
         self.collectionView.alwaysBounceHorizontal = false
 
         resetCachedAssets()
         PHPhotoLibrary.shared().register(self)
         collectionView.register(GridViewCell.self, forCellWithReuseIdentifier: "GridViewCell")
+        collectionView.register(XOCameraCell.self, forCellWithReuseIdentifier: "XOCameraCell")
         // Reaching this point without a segue means that this AssetGridViewController
         // became visible at app launch. As such, match the behavior of the segue from
         // the default "All Photos" view.
@@ -80,7 +85,13 @@ class XOAssetGridViewController: UICollectionViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        let width = view.bounds.inset(by: view.safeAreaInsets).width
+        let width: CGFloat
+        if #available(iOS 11.0, *) {
+            width = view.bounds.inset(by: view.safeAreaInsets).width
+        } else {
+            // Fallback on earlier versions
+            width = view.bounds.width
+        }
         // Adjust the item size if the available width has changed.
         if availableWidth != width {
             availableWidth = width
@@ -101,9 +112,9 @@ class XOAssetGridViewController: UICollectionViewController {
         let cellSize = collectionViewFlowLayout.itemSize
         thumbnailSize = CGSize(width: cellSize.width * scale, height: cellSize.height * scale)
         
-        // Add a button to the navigation bar if the asset collection supports adding content.
-        if assetCollection == nil || assetCollection.canPerform(.addContent) {
-            navigationItem.rightBarButtonItem = nil
+        // Add a camera button to the navigation bar if the asset collection supports adding content.
+        if assetCollection == nil || assetCollection.canPerform(.addContent) && __configInfo.showTakePhotoButton {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.camera, target: self, action: #selector(self.__presentImagePickerController))
         } else {
             navigationItem.rightBarButtonItem = nil
         }
@@ -117,14 +128,12 @@ class XOAssetGridViewController: UICollectionViewController {
     // MARK: UICollectionView
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if __configInfo.showTakePhotoButton {
-            return fetchResult.count + 1
-        }
         return fetchResult.count
     }
     
     /// - Tag: PopulateCell
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         let asset = fetchResult.object(at: indexPath.item)
         // Dequeue a GridViewCell.
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GridViewCell", for: indexPath) as? GridViewCell
@@ -155,24 +164,11 @@ class XOAssetGridViewController: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        if __isShowTakePhotoButton(indexPath: indexPath) {
-            __presentImagePickerController()
-        } else {
-//            let vc = XOAssetViewController()
-//            vc.asset = fetchResult.object(at: indexPath.item)
-//            vc.assetCollection = assetCollection
-//            self.navigationController?.pushViewController(vc, animated: true)
-            // 预览
-        }
-        
-        
+        __pushPreviewController(indexPath: indexPath)
     }
     
     
-    
     // MARK: UIScrollView
-    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateCachedAssets()
     }
@@ -322,27 +318,28 @@ extension XOAssetGridViewController: PHPhotoLibraryChangeObserver {
 private
 extension XOAssetGridViewController {
     
-    func __showAsset(indexPath: IndexPath) -> PHAsset {
-        let config = __configInfo
-        if config.showTakePhotoButton && config.sortAscendingByModificationDate == true {
-            return fetchResult.object(at: indexPath.item - 1)
-        }
-        return fetchResult.object(at: indexPath.item)
-    }
+//    func __getAsset(indexPath: IndexPath) -> PHAsset {
+//        let config = __configInfo
+//        if config.showTakePhotoButton && config.sortAscendingByModificationDate == true {
+//            return fetchResult.object(at: indexPath.item - 1)
+//        }
+//        return fetchResult.object(at: indexPath.item)
+//    }
     
-    func __isShowTakePhotoButton(indexPath: IndexPath) -> Bool {
-        let config = __configInfo
-        if config.showTakePhotoButton {
-            if config.sortAscendingByModificationDate == true && indexPath.item == 0 {
-                return true
-            }
-            if config.sortAscendingByModificationDate == false && indexPath.item ==  fetchResult.count - 1 {
-                return true
-            }
-        }
-        return false
-    }
+//    func __isShowTakePhotoButton(indexPath: IndexPath) -> Bool {
+//        let config = __configInfo
+//        if config.showTakePhotoButton {
+//            if config.sortAscendingByModificationDate == true && indexPath.item == 0 {
+//                return true
+//            }
+//            if config.sortAscendingByModificationDate == false && indexPath.item ==  fetchResult.count - 1 {
+//                return true
+//            }
+//        }
+//        return false
+//    }
     
+    @objc
     func __presentImagePickerController() {
         let config = __configInfo
         let vc = UIImagePickerController()
@@ -352,12 +349,28 @@ extension XOAssetGridViewController {
         vc.cameraCaptureMode = config.cameraCaptureMode
         vc.cameraDevice = config.cameraDevice
         vc.mediaTypes = config.mediaTypes
-        vc.imageExportPreset = config.imageExportPreset
+        if #available(iOS 11.0, *) {
+            vc.imageExportPreset = config.imageExportPreset
+        } else {
+            // Fallback on earlier versions
+        }
         vc.sourceType = config.sourceType
-        vc.videoExportPreset = config.videoExportPreset.rawValue
+        if #available(iOS 11.0, *) {
+            vc.videoExportPreset = config.videoExportPreset.rawValue
+        } else {
+            // Fallback on earlier versions
+        }
         vc.videoMaximumDuration = config.videoMaximumDuration
         vc.videoQuality = config.videoQuality
         self.present(vc, animated: true, completion: nil)
+    }
+    
+    func __pushPreviewController(indexPath: IndexPath) {
+        let vc = XOPhotoPreviewController()
+        vc.fetchResult = self.fetchResult
+        vc.assetCollection = self.assetCollection
+        vc.currentIndex = indexPath.item
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

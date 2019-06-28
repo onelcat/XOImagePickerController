@@ -9,12 +9,14 @@ import UIKit
 import Photos
 import PhotosUI
 
+// 单独预览资源
 class XOAssetViewController: UIViewController {
     
     var asset: PHAsset!
     var assetCollection: PHAssetCollection!
     
     @IBOutlet weak var imageView: UIImageView!
+    
     @IBOutlet weak var livePhotoView: PHLivePhotoView!
     @IBOutlet weak var editButton: UIBarButtonItem!
     @IBOutlet weak var progressView: UIProgressView!
@@ -226,13 +228,18 @@ class XOAssetViewController: UIViewController {
     }
     
     func updateImage() {
-        if asset.mediaSubtypes.contains(.photoLive) {
-            updateLivePhoto()
+        if #available(iOS 9.1, *) {
+            if asset.mediaSubtypes.contains(.photoLive) {
+                updateLivePhoto()
+            } else {
+                updateStaticImage()
+            }
         } else {
+            // Fallback on earlier versions
             updateStaticImage()
         }
     }
-    
+    @available (iOS 9.1, *)
     func updateLivePhoto() {
         // Prepare the options to pass when fetching the live photo.
         let options = PHLivePhotoRequestOptions()
@@ -310,6 +317,7 @@ class XOAssetViewController: UIViewController {
     // Returns a filter-applier function for the named filter.
     // Use the function as a handler for a UIAlertAction object.
     /// - Tag: ApplyFilter
+    @available (iOS 10.0, *)
     func getFilter(_ filterName: String) -> (UIAlertAction) -> Void {
         func applyFilter(_: UIAlertAction) {
             // Set up a handler to handle prior edits.
@@ -360,7 +368,7 @@ class XOAssetViewController: UIViewController {
         }
         return applyFilter
     }
-    
+    @available (iOS 10.0, *)
     func applyPhotoFilter(_ filterName: String, input: PHContentEditingInput, output: PHContentEditingOutput, completion: () -> Void) {
         
         // Load the full-size image.
@@ -381,7 +389,7 @@ class XOAssetViewController: UIViewController {
         }
         completion()
     }
-    
+    @available (iOS 10.0, *)
     func applyLivePhotoFilter(_ filterName: String, input: PHContentEditingInput, output: PHContentEditingOutput, completion: @escaping () -> Void) {
         
         // This app filters assets only for output. In an app that previews
@@ -449,10 +457,12 @@ extension XOAssetViewController: PHPhotoLibraryChangeObserver {
 
 // MARK: PHLivePhotoViewDelegate
 extension XOAssetViewController: PHLivePhotoViewDelegate {
+    @available(iOS 9.1, *)
     func livePhotoView(_ livePhotoView: PHLivePhotoView, willBeginPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
         isPlayingHint = (playbackStyle == .hint)
     }
     
+    @available(iOS 9.1, *)
     func livePhotoView(_ livePhotoView: PHLivePhotoView, didEndPlaybackWith playbackStyle: PHLivePhotoViewPlaybackStyle) {
         isPlayingHint = (playbackStyle == .hint)
     }

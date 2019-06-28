@@ -12,6 +12,7 @@ class XOCameraCell: UICollectionViewCell {
     
     lazy var imageView: UIImageView = {
         let view = UIImageView()
+        view.image = UIImage(XOKit: "takePicture80")
         return view
     }()
     

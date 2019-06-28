@@ -41,21 +41,33 @@ class GridViewCell: UICollectionViewCell {
     }()
     
     private
-    lazy var livePhotoBadgeImage: UIImage = {
-        let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
-        return image
+    lazy var livePhotoBadgeImage: UIImage? = {
+        if #available(iOS 9.1, *) {
+            let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
+            return image
+        } else {
+            return nil
+        }
     }()
     
     private
-    lazy var gifPhotoBadgeImage: UIImage = {
-        let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
-        return image
+    lazy var gifPhotoBadgeImage: UIImage? = {
+        if #available(iOS 9.1, *) {
+            let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
+            return image
+        } else {
+            return nil
+        }
     }()
     
     private
-    lazy var videoPhotoBadgeImage: UIImage = {
-        let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
-        return image
+    lazy var videoPhotoBadgeImage: UIImage? = {
+        if #available(iOS 9.1, *) {
+            let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
+            return image
+        } else {
+            return nil
+        }
     }()
     
     var representedAssetIdentifier: String!

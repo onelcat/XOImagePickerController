@@ -38,7 +38,6 @@ open class XOImagePickerController: UINavigationController {
     /// default value is UIImagePickerControllerQualityTypeMedium. If the cameraDevice does not support the videoQuality, it will use the default value.
     open var videoQuality: UIImagePickerController.QualityType = .typeMedium
     
-
     /// videoExportPreset can be used to specify the transcoding quality for videos (via a AVAssetExportPreset* string). If the value is nil (the default) then the transcodeQuality is determined by videoQuality instead. Not valid if the source type is UIImagePickerControllerSourceTypeCamera
     open var videoExportPreset: AVCaptureSession.Preset = .hd1280x720
     
@@ -81,7 +80,7 @@ open class XOImagePickerController: UINavigationController {
     
     open var sortAscendingByModificationDate = true
     
-    init() {
+    public init() {
         let vc = XOAssetGridViewController()
         super.init(rootViewController: vc)
     }
