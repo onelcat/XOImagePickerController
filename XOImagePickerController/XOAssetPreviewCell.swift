@@ -24,7 +24,7 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
         if scale > 2.0 {
             scale = 2.0
         }
-        return CGSize(width: _imageView.bounds.width * scale, height: _imageView.bounds.height * scale)
+        return CGSize(width: self.bounds.width * scale, height: self.bounds.height * scale)
     }
     
     lazy private var _imageView: UIImageView = {
@@ -132,9 +132,11 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
             // The handler may originate on a background queue, so
             // re-dispatch to the main queue for UI work.
             DispatchQueue.main.sync {
+                debugPrint(progress)
                 self._progressView.progress = Float(progress)
             }
         }
+        debugPrint("显示资源", asset)
         self.imageRequestID = PHImageManager.default().requestImage(for: asset, targetSize: _targetSize,contentMode: .aspectFit,options: options,resultHandler: { image, _ in
             // PhotoKit finished the request, so hide the progress view.
             self._progressView.isHidden = true
@@ -194,7 +196,13 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
 }
 
 extension XOPhotoPreviewCell:UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return self._imageView
+    }
     
+    func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
+        scrollView.contentInset = UIEdgeInsets.zero
+    }
 }
 //
 //class XOVideoPreviewCell:UICollectionViewCell , XOAssetPreviewCell {

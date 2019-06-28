@@ -52,6 +52,7 @@ class XOPhotoPreviewController: UIViewController {
         super.viewWillAppear(animated)
         
         self.navigationController?.setToolbarHidden(true, animated: true)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
         UIApplication.shared.isStatusBarHidden = true
         
         let w = self.view.frame.width + 20
@@ -81,6 +82,7 @@ class XOPhotoPreviewController: UIViewController {
     }
     
 }
+
 
 private
 extension XOPhotoPreviewController {
