@@ -17,7 +17,11 @@ protocol XOAssetPreviewCell {
 
 class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     
-    var imageRequestID: PHImageRequestID = 0
+    private
+    var _imageRequestID: PHImageRequestID = 0
+    
+    private var _image: UIImage?
+    
     private
     var _targetSize: CGSize {
         var scale = UIScreen.main.scale
@@ -61,8 +65,8 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
             guard let asset = self.dataSource else {
                 return
             }
-            if self.imageRequestID != 0 {
-                PHImageManager.default().cancelImageRequest(imageRequestID)
+            if self._imageRequestID != 0 {
+                PHImageManager.default().cancelImageRequest(_imageRequestID)
             }
             __updateStaticImage(asset)
             __configMaximumZoomScale()
@@ -136,16 +140,20 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
                 self._progressView.progress = Float(progress)
             }
         }
-        debugPrint("显示资源", asset)
-        self.imageRequestID = PHImageManager.default().requestImage(for: asset, targetSize: _targetSize,contentMode: .aspectFit,options: options,resultHandler: { image, _ in
+        
+//        debugPrint("显示资源", asset)
+        var temp_image: UIImage?
+        self._imageRequestID = PHImageManager.default().requestImage(for: asset, targetSize: _targetSize,contentMode: .aspectFit,options: options,resultHandler: { image, _ in
             // PhotoKit finished the request, so hide the progress view.
             self._progressView.isHidden = true
             // If the request succeeded, show the image view.
-            guard let image = image else { return }
+            guard let img = image else { return }
+//            self._image = img
+            temp_image = img
             self._imageView.isHidden = false
-            self._imageView.image = image
+            self._imageView.image = temp_image
             self.__resizeSubviews()
-            self.imageRequestID = 0
+            self._imageRequestID = 0
         })
     }
     
@@ -197,6 +205,10 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
 
 extension XOPhotoPreviewCell:UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        let x = (_scrollView.bounds.width) / 2.0
+        let y = (_scrollView.bounds.height) / 2.0
+        _imageView.center = CGPoint(x: x, y: y)
+        
         return self._imageView
     }
     
