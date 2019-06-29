@@ -18,8 +18,8 @@ class XOPhotoPreviewController: UIViewController {
     
     var currentIndex: Int = 0
     
-    private var _offsetItemCount:CGFloat = 0
-    
+    private var _offsetItemCount: CGFloat = 0
+    private var _availableWidth: CGFloat = 0
     lazy private var _layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -33,6 +33,8 @@ class XOPhotoPreviewController: UIViewController {
         view.scrollsToTop = false;
         view.showsHorizontalScrollIndicator = false
         view.contentOffset = CGPoint.zero
+        let w = self.view.bounds.width
+        view.contentSize = CGSize(width: CGFloat(fetchResult.count) * (w + 20.0), height: 0)
         return view
     }()
     
@@ -40,6 +42,7 @@ class XOPhotoPreviewController: UIViewController {
         super.viewDidLoad()
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
+        
         self.view.addSubview(_collectionView)
         _collectionView.register(XOPhotoPreviewCell.self, forCellWithReuseIdentifier: "XOPhotoPreviewCell")
         
@@ -58,14 +61,33 @@ class XOPhotoPreviewController: UIViewController {
         let w = self.view.frame.width + 20
         _collectionView.setContentOffset(CGPoint(x: w * CGFloat(self.currentIndex), y: 0), animated: false)
     }
-    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        let width: CGFloat
+        let height: CGFloat = view.bounds.height
+        if #available(iOS 11.0, *) {
+            width = view.bounds.inset(by: view.safeAreaInsets).width
+//            height = view.bounds.inset(by: view.safeAreaInsets).height
+        } else {
+            // Fallback on earlier versions
+            width = view.bounds.width
+//            height = view.bounds.height
+        }
+        // Adjust the item size if the available width has changed.
+        if _availableWidth != width {
+            _availableWidth = width
+            _layout.itemSize = CGSize(width: width + 20, height: height)
+            _layout.minimumInteritemSpacing = 0;
+            _layout.minimumLineSpacing = 0;
+            let count = fetchResult.count
+            _collectionView.contentSize = CGSize(width: CGFloat(count) * (width + 20.0), height: 0)
+            _collectionView.frame = CGRect(x: -10, y: 0, width: width + 20, height: height)
+            _collectionView.setCollectionViewLayout(_layout, animated: false)
+            
+        }
+    }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        _layout.itemSize = CGSize(width: self.view.bounds.width + 20, height: self.view.bounds.height)
-        _layout.minimumInteritemSpacing = 0;
-        _layout.minimumLineSpacing = 0;
-        _collectionView.frame = CGRect(x: -10, y: 0, width: self.view.bounds.width + 20, height: self.view.bounds.height)
-        _collectionView.setCollectionViewLayout(_layout, animated: false)
         if (_offsetItemCount > 0) {
             let offsetX = _offsetItemCount * _layout.itemSize.width;
             _collectionView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: false)
@@ -81,6 +103,11 @@ class XOPhotoPreviewController: UIViewController {
         _offsetItemCount = _collectionView.contentOffset.x / _layout.itemSize.width;
     }
     
+    private
+    func __didTapPreviewCell() {
+        let isHideNaviBar = self.navigationController?.isNavigationBarHidden ?? false
+        self.navigationController?.setNavigationBarHidden(!isHideNaviBar, animated: true)
+    }
 }
 
 
@@ -100,8 +127,10 @@ extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionView
             fatalError()
         }
         cell.dataSource = fetchResult.object(at: indexPath.item)
+        cell.singleTapHander = { [weak self] in
+            self?.__didTapPreviewCell()
+        }
         return cell
     }
-    
     
 }

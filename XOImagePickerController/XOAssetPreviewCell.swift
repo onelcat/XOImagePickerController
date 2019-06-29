@@ -17,10 +17,10 @@ protocol XOAssetPreviewCell {
 
 class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     
+    var singleTapHander:(()->Void)?
+    
     private
     var _imageRequestID: PHImageRequestID = 0
-    
-    private var _image: UIImage?
     
     private
     var _targetSize: CGSize {
@@ -69,7 +69,6 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
                 PHImageManager.default().cancelImageRequest(_imageRequestID)
             }
             __updateStaticImage(asset)
-            __configMaximumZoomScale()
         }
     }
 
@@ -100,14 +99,24 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        _scrollView.frame = CGRect(x: 10, y: 0, width: self.bounds.width - 20, height: self.bounds.height)
-        _imageView.frame = _scrollView.bounds
+        
+        let width: CGFloat
+        let height: CGFloat = self.bounds.height
+        if #available(iOS 11.0, *) {
+            width = self.bounds.inset(by: self.safeAreaInsets).width
+        } else {
+            // Fallback on earlier versions
+            width = self.bounds.width
+        }
+        _scrollView.frame = CGRect(x: 10, y: 0, width: width - 20, height: height)
         __recoverSubviews()
     }
 
     @objc
     func singleTap(_ tap: UITapGestureRecognizer?) {
-        
+        if let handler = singleTapHander {
+            handler()
+        }
     }
     
     @objc
@@ -140,21 +149,20 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
                 self._progressView.progress = Float(progress)
             }
         }
-        
-//        debugPrint("显示资源", asset)
+        // MARK: 防止内存💥
         var temp_image: UIImage?
         self._imageRequestID = PHImageManager.default().requestImage(for: asset, targetSize: _targetSize,contentMode: .aspectFit,options: options,resultHandler: { image, _ in
             // PhotoKit finished the request, so hide the progress view.
             self._progressView.isHidden = true
             // If the request succeeded, show the image view.
             guard let img = image else { return }
-//            self._image = img
             temp_image = img
             self._imageView.isHidden = false
             self._imageView.image = temp_image
             self.__resizeSubviews()
             self._imageRequestID = 0
         })
+        __configMaximumZoomScale()
     }
     
     private
@@ -176,10 +184,10 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     }
     
     func __resizeSubviews() {
-        let imgW = self._scrollView.bounds.width
         guard let image = _imageView.image else {
             return
         }
+        let imgW = self._scrollView.bounds.width
         var imgH:CGFloat
         if (image.size.height / image.size.width > self.bounds.height / self._scrollView.bounds.height) {
             imgH = (image.size.height / (image.size.width / self._scrollView.bounds.width))
@@ -195,21 +203,30 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
         _scrollView.contentSize = CGSize(width: self._scrollView.bounds.width, height: contentSizeH)
         _scrollView.scrollRectToVisible(self.bounds, animated: false)
         _scrollView.alwaysBounceVertical = imgH <= self.bounds.height ? false : true
+        
         let x = (_scrollView.bounds.width - imgW) / 2.0
         let y = (_scrollView.bounds.height - imgH) / 2.0
-        _imageView.bounds = CGRect(x: x, y: y, width: imgW, height: imgH)
-//        _imageView.center = CGPoint(x: imgW / 2.0, y: imgH / 2.0)
+
+        _imageView.frame = CGRect(x: x, y: y, width: imgW, height: imgH)
+        
+    }
+    
+    private
+    func __refreshImageContainerViewCenter() {
+        let offsetX = (_scrollView.bounds.width > _scrollView.contentSize.width) ? ((_scrollView.bounds.width - _scrollView.contentSize.width) * 0.5) : 0.0;
+        let offsetY = (_scrollView.bounds.height > _scrollView.contentSize.height) ? ((_scrollView.bounds.height - _scrollView.contentSize.height) * 0.5) : 0.0;
+        self._imageView.center = CGPoint(x: _scrollView.contentSize.width * 0.5 + offsetX, y: _scrollView.contentSize.height * 0.5 + offsetY)
     }
     
 }
 
 extension XOPhotoPreviewCell:UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        let x = (_scrollView.bounds.width) / 2.0
-        let y = (_scrollView.bounds.height) / 2.0
-        _imageView.center = CGPoint(x: x, y: y)
-        
         return self._imageView
+    }
+    
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        __refreshImageContainerViewCenter()
     }
     
     func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
