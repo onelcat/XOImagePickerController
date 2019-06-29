@@ -33,8 +33,6 @@ class XOPhotoPreviewController: UIViewController {
         view.scrollsToTop = false;
         view.showsHorizontalScrollIndicator = false
         view.contentOffset = CGPoint.zero
-        let w = self.view.bounds.width
-        view.contentSize = CGSize(width: CGFloat(fetchResult.count) * (w + 20.0), height: 0)
         return view
     }()
     
@@ -46,6 +44,11 @@ class XOPhotoPreviewController: UIViewController {
         self.view.addSubview(_collectionView)
         _collectionView.register(XOPhotoPreviewCell.self, forCellWithReuseIdentifier: "XOPhotoPreviewCell")
         
+        if #available(iOS 11.0, *) {
+            _collectionView.contentInsetAdjustmentBehavior = .never
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = false
+        }
         self.view.clipsToBounds = true;
         NotificationCenter.default.addObserver(self, selector: #selector(__didChangeStatusBarOrientationNotification(noti:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         // Do any additional setup after loading the view.
@@ -58,8 +61,6 @@ class XOPhotoPreviewController: UIViewController {
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         UIApplication.shared.isStatusBarHidden = true
         
-        let w = self.view.frame.width + 20
-        _collectionView.setContentOffset(CGPoint(x: w * CGFloat(self.currentIndex), y: 0), animated: false)
     }
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
