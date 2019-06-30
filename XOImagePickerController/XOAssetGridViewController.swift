@@ -67,7 +67,7 @@ class XOAssetGridViewController: UICollectionViewController {
 
         resetCachedAssets()
         PHPhotoLibrary.shared().register(self)
-        collectionView.register(GridViewCell.self, forCellWithReuseIdentifier: "GridViewCell")
+        collectionView.register(XOGridViewCell.self, forCellWithReuseIdentifier: "XOGridViewCell")
         collectionView.register(XOCameraCell.self, forCellWithReuseIdentifier: "XOCameraCell")
         // Reaching this point without a segue means that this AssetGridViewController
         // became visible at app launch. As such, match the behavior of the segue from
@@ -136,7 +136,7 @@ class XOAssetGridViewController: UICollectionViewController {
         
         let asset = fetchResult.object(at: indexPath.item)
         // Dequeue a GridViewCell.
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GridViewCell", for: indexPath) as? GridViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOGridViewCell", for: indexPath) as? XOGridViewCell
             else { fatalError("Unexpected cell in collection view") }
         var mediaType: MediaType = .image
         // Add a badge to the cell if the PHAsset represents a Live Photo.

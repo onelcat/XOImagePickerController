@@ -8,7 +8,7 @@ Implements the collection view cell for displaying an asset in the grid view.
 import UIKit
 import PhotosUI
 
-class GridViewCell: UICollectionViewCell {
+class XOGridViewCell: UICollectionViewCell {
     
     private
     lazy var imageView: UIImageView = {

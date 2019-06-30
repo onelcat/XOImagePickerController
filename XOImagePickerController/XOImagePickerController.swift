@@ -2,7 +2,7 @@
 //  XOImagePickerController.swift
 //  XOImagePickerController
 //
-//  Created by luo fengyuan on 2019/6/25.
+//  Created by hao shuai on 2019/6/25.
 //  Copyright © 2019 luo fengyuan. All rights reserved.
 //
 

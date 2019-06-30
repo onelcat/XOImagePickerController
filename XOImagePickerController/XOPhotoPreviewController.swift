@@ -2,14 +2,14 @@
 //  XOPhotoPreviewController.swift
 //  XOImagePickerController
 //
-//  Created by luo fengyuan on 2019/6/28.
+//  Created by hao shuai on 2019/6/28.
 //  Copyright © 2019 luo fengyuan. All rights reserved.
 //
 
 import UIKit
 import Photos
-private let reuseIdentifier = "Cell"
 
+final
 class XOPhotoPreviewController: UIViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!
@@ -43,7 +43,7 @@ class XOPhotoPreviewController: UIViewController {
         
         self.view.addSubview(_collectionView)
         _collectionView.register(XOPhotoPreviewCell.self, forCellWithReuseIdentifier: "XOPhotoPreviewCell")
-        
+        _collectionView.register(XOVideoPreviewCell.self, forCellWithReuseIdentifier: "XOVideoPreviewCell")
         if #available(iOS 11.0, *) {
             _collectionView.contentInsetAdjustmentBehavior = .never
         } else {
@@ -56,23 +56,35 @@ class XOPhotoPreviewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        let width: CGFloat
+        if #available(iOS 11.0, *) {
+            width = view.bounds.inset(by: view.safeAreaInsets).width
+        } else {
+            // Fallback on earlier versions
+            width = view.bounds.width
+        }
         self.navigationController?.setToolbarHidden(true, animated: true)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        UIApplication.shared.isStatusBarHidden = true
-        
+        if #available(iOS 9.0,*) {
+            
+        } else {
+            UIApplication.shared.isStatusBarHidden = true
+        }
+        if self.currentIndex > 0 {
+            _collectionView.setContentOffset(CGPoint(x: (width + 20 ) * CGFloat(self.currentIndex), y: 0), animated: false)
+        }
+        __refreshNaviBarAndBottomBarState()
     }
+    
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         let width: CGFloat
         let height: CGFloat = view.bounds.height
         if #available(iOS 11.0, *) {
             width = view.bounds.inset(by: view.safeAreaInsets).width
-//            height = view.bounds.inset(by: view.safeAreaInsets).height
         } else {
             // Fallback on earlier versions
             width = view.bounds.width
-//            height = view.bounds.height
         }
         // Adjust the item size if the available width has changed.
         if _availableWidth != width {
@@ -98,23 +110,71 @@ class XOPhotoPreviewController: UIViewController {
     func prefersStatusBarHidden() -> Bool {
         return true
     }
-    
-    @objc private
-    func __didChangeStatusBarOrientationNotification(noti: Notification) {
-        _offsetItemCount = _collectionView.contentOffset.x / _layout.itemSize.width;
-    }
-    
-    private
-    func __didTapPreviewCell() {
-        let isHideNaviBar = self.navigationController?.isNavigationBarHidden ?? false
-        self.navigationController?.setNavigationBarHidden(!isHideNaviBar, animated: true)
-    }
 }
-
 
 private
 extension XOPhotoPreviewController {
     
+    @objc
+    func __didChangeStatusBarOrientationNotification(noti: Notification) {
+        _offsetItemCount = _collectionView.contentOffset.x / _layout.itemSize.width;
+    }
+    
+    func __didTapPreviewCell() {
+        let isHideNaviBar = self.navigationController?.isNavigationBarHidden ?? false
+        self.navigationController?.setNavigationBarHidden(!isHideNaviBar, animated: true)
+    }
+    func __refreshNaviBarAndBottomBarState() {
+        
+    }
+//    - (void)refreshNaviBarAndBottomBarState {
+//    TZImagePickerController *_tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+//    TZAssetModel *model = _models[self.currentIndex];
+//    _selectButton.selected = model.isSelected;
+//    [self refreshSelectButtonImageViewContentMode];
+//    if (_selectButton.isSelected && _tzImagePickerVc.showSelectedIndex && _tzImagePickerVc.showSelectBtn) {
+//    NSString *index = [NSString stringWithFormat:@"%d", (int)([_tzImagePickerVc.selectedAssetIds indexOfObject:model.asset.localIdentifier] + 1)];
+//    _indexLabel.text = index;
+//    _indexLabel.hidden = NO;
+//    } else {
+//    _indexLabel.hidden = YES;
+//    }
+//    _numberLabel.text = [NSString stringWithFormat:@"%zd",_tzImagePickerVc.selectedModels.count];
+//    _numberImageView.hidden = (_tzImagePickerVc.selectedModels.count <= 0 || _isHideNaviBar || _isCropImage);
+//    _numberLabel.hidden = (_tzImagePickerVc.selectedModels.count <= 0 || _isHideNaviBar || _isCropImage);
+//
+//    _originalPhotoButton.selected = _isSelectOriginalPhoto;
+//    _originalPhotoLabel.hidden = !_originalPhotoButton.isSelected;
+//    if (_isSelectOriginalPhoto) [self showPhotoBytes];
+//
+//    // If is previewing video, hide original photo button
+//    // 如果正在预览的是视频，隐藏原图按钮
+//    if (!_isHideNaviBar) {
+//    if (model.type == TZAssetModelMediaTypeVideo) {
+//    _originalPhotoButton.hidden = YES;
+//    _originalPhotoLabel.hidden = YES;
+//    } else {
+//    _originalPhotoButton.hidden = NO;
+//    if (_isSelectOriginalPhoto)  _originalPhotoLabel.hidden = NO;
+//    }
+//    }
+//
+//    _doneButton.hidden = NO;
+//    _selectButton.hidden = !_tzImagePickerVc.showSelectBtn;
+//    // 让宽度/高度小于 最小可选照片尺寸 的图片不能选中
+//    if (![[TZImageManager manager] isPhotoSelectableWithAsset:model.asset]) {
+//    _numberLabel.hidden = YES;
+//    _numberImageView.hidden = YES;
+//    _selectButton.hidden = YES;
+//    _originalPhotoButton.hidden = YES;
+//    _originalPhotoLabel.hidden = YES;
+//    _doneButton.hidden = YES;
+//    }
+//
+//    if (_tzImagePickerVc.photoPreviewPageDidRefreshStateBlock) {
+//    _tzImagePickerVc.photoPreviewPageDidRefreshStateBlock(_collectionView, _naviBar, _backButton, _selectButton, _indexLabel, _toolBar, _originalPhotoButton, _originalPhotoLabel, _doneButton, _numberImageView, _numberLabel);
+//    }
+//    }
 }
 
 extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -124,14 +184,49 @@ extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionView
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOPhotoPreviewCell", for: indexPath) as? XOPhotoPreviewCell else {
-            fatalError()
+        
+        let asset = fetchResult.object(at: indexPath.item)
+        if asset.mediaType == .image {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOPhotoPreviewCell", for: indexPath) as? XOPhotoPreviewCell else {
+                fatalError()
+            }
+            cell.dataSource = asset
+            cell.singleTapHander = { [weak self] in
+                self?.__didTapPreviewCell()
+            }
+            return cell
         }
-        cell.dataSource = fetchResult.object(at: indexPath.item)
-        cell.singleTapHander = { [weak self] in
-            self?.__didTapPreviewCell()
+        if asset.mediaType == .video {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOVideoPreviewCell", for: indexPath) as? XOVideoPreviewCell else {
+                fatalError()
+            }
+            cell.dataSource = asset
+            cell.singleTapHander = { [weak self] in
+                self?.__didTapPreviewCell()
+            }
+            return cell
         }
-        return cell
+        fatalError()
     }
     
+}
+
+extension XOPhotoPreviewController {
+    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        let width: CGFloat
+        if #available(iOS 11.0, *) {
+            width = view.bounds.inset(by: view.safeAreaInsets).width
+        } else {
+            width = view.bounds.width
+        }
+        var offSetWidth = scrollView.contentOffset.x;
+        offSetWidth = offSetWidth +  ((width + 20) * 0.5);
+//
+        let currentIndex:Int = Int(offSetWidth / (width + 20));
+        if currentIndex < self.fetchResult.count && self.currentIndex != currentIndex {
+            self.currentIndex = currentIndex
+            __refreshNaviBarAndBottomBarState()
+        }
+        NotificationCenter.default.post(name: NSNotification.Name.XOKit.PhotoPreviewCollectionViewDidScroll, object: nil)
+    }
 }

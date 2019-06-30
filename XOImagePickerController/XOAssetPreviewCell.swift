@@ -2,7 +2,7 @@
 //  XOAssetPreviewCell.swift
 //  XOImagePickerController
 //
-//  Created by luo fengyuan on 2019/6/28.
+//  Created by hao shuai on 2019/6/28.
 //  Copyright © 2019 luo fengyuan. All rights reserved.
 //
 
@@ -12,9 +12,11 @@ import Photos
 
 protocol XOAssetPreviewCell {
     var dataSource: PHAsset? { get set }
+    var singleTapHander:(()->Void)? { get set }
     func singleTap(_ tap: UITapGestureRecognizer?)
 }
 
+final
 class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     
     var singleTapHander:(()->Void)?
@@ -220,7 +222,7 @@ class XOPhotoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
     
 }
 
-extension XOPhotoPreviewCell:UIScrollViewDelegate {
+extension XOPhotoPreviewCell: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return self._imageView
     }
@@ -233,18 +235,168 @@ extension XOPhotoPreviewCell:UIScrollViewDelegate {
         scrollView.contentInset = UIEdgeInsets.zero
     }
 }
-//
-//class XOVideoPreviewCell:UICollectionViewCell , XOAssetPreviewCell {
-//
-//
-//    var dataSource: PHAsset? {
-//        didSet {
-//
-//        }
-//    }
-//
-//    func singleTap(_ tap: UITapGestureRecognizer?) {
-//
-//    }
-//
-//}
+
+
+final class XOVideoPreviewCell: UICollectionViewCell, XOAssetPreviewCell {
+    
+    var dataSource: PHAsset? {
+        didSet {
+            guard let asset = self.dataSource else {
+                return
+            }
+            if self._imageRequestID != 0 {
+                PHImageManager.default().cancelImageRequest(_imageRequestID)
+            }
+            __updateVideo(asset)
+        } // didSet
+    }
+    
+    var singleTapHander:(()->Void)?
+    
+    private var _imageRequestID: PHImageRequestID = 0
+    
+    private var _player: AVPlayer?
+    
+    private var _playerLayer: AVPlayerLayer?
+    
+    lazy private var _progressView: UIProgressView = {
+        let view = UIProgressView()
+        view.progress = 0.0
+        return view
+    }()
+    
+    lazy private var _videoPlayImage: UIImage? = {
+        return UIImage(XOKit: "MMVideoPreviewPlay")
+    }()
+    
+    lazy private var _playButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        button.setImage(_videoPlayImage, for: UIControl.State.normal)
+        let imageHig = UIImage(XOKit: "MMVideoPreviewPlayHL")
+        button.setImage(imageHig, for: UIControl.State.highlighted)
+        return button
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        _playButton.addTarget(self, action: #selector(self.__playButtonClick), for: UIControl.Event.touchUpInside)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(__photoPreviewCollectionViewDidScroll), name: NSNotification.Name.XOKit.PhotoPreviewCollectionViewDidScroll, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(__appWillResignActiveNotification), name: UIApplication.willResignActiveNotification, object: nil)
+        
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        _playerLayer?.frame = contentView.bounds
+        _playButton.frame = contentView.bounds
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func singleTap(_ tap: UITapGestureRecognizer?) {
+        guard let handler = singleTapHander else { return }
+        handler()
+    }
+    
+}
+
+private
+extension XOVideoPreviewCell {
+    
+    func __updateVideo(_ asset: PHAsset) {
+        let options = PHVideoRequestOptions()
+        options.deliveryMode = .mediumQualityFormat
+        options.isNetworkAccessAllowed = true
+        options.progressHandler = { progress, _, _, _ in
+            // The handler may originate on a background queue, so
+            // re-dispatch to the main queue for UI work.
+            DispatchQueue.main.sync {
+                debugPrint(progress)
+                self._progressView.progress = Float(progress)
+            }
+        }
+        PHImageManager.default().requestPlayerItem(forVideo: asset, options: options) { [weak self] (playerItem, info) in
+            guard let item = playerItem else {
+                return
+            }
+            DispatchQueue.main.async {
+                self?.__setPlayerItem(item)
+            }
+        }
+    }
+    
+    func __setPlayerItem(_ value: AVPlayerItem) {
+        _player = AVPlayer(playerItem: value)
+        _playerLayer = AVPlayerLayer(player: _player)
+        _playerLayer?.backgroundColor = UIColor.black.cgColor
+        _playerLayer?.frame = contentView.bounds
+        guard let playerLayer = _playerLayer else {
+            return
+        }
+        self.contentView.layer.addSublayer(playerLayer)
+        
+        _playButton.frame = contentView.bounds
+        self.contentView.addSubview(_playButton)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.__pausePlayerAndShowNaviBar), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: _player!.currentItem)
+    }
+    
+    @objc
+    func __pausePlayerAndShowNaviBar() {
+        _player?.pause()
+        _playButton.setImage(_videoPlayImage, for: UIControl.State.normal)
+        singleTap(nil)
+    }
+    
+    @objc
+    func __playButtonClick() {
+        guard let player = self._player,let currentItem = _player?.currentItem else {
+            return
+        }
+        let currentTime: CMTime = currentItem.currentTime();
+        let durationTime = currentItem.duration;
+        if player.rate == 0.0 {
+            
+            if currentTime.value == durationTime.value {
+                currentItem.seek(to: CMTime(seconds: 0, preferredTimescale: 1))
+            }
+            player.play()
+//            _playButton.isHidden = true
+            _playButton.setImage(nil, for: UIControl.State.normal)
+            if #available(iOS 9.0,*) {
+
+            } else {
+                UIApplication.shared.isStatusBarHidden = true
+            }
+            singleTap(nil)
+        } else {
+            _playButton.setImage(_videoPlayImage, for: UIControl.State.normal)
+            __pausePlayerAndShowNaviBar()
+        }
+    }
+    
+    @objc
+    func __photoPreviewCollectionViewDidScroll() {
+        if let player = _player, player.rate != 0.0 {
+            __pausePlayerAndShowNaviBar()
+        }
+    }
+    @objc
+    func __appWillResignActiveNotification() {
+        if let player = _player, player.rate != 0.0 {
+            __pausePlayerAndShowNaviBar()
+        }
+    }
+    
+}
+
+extension Notification.Name {
+    struct XOKit {
+        static let PhotoPreviewCollectionViewDidScroll = Notification.Name.init(rawValue: "XOPhotoPreviewCollectionViewDidScroll")
+    }
+}

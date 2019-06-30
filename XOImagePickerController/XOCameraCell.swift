@@ -2,7 +2,7 @@
 //  XOCameraCell.swift
 //  XOImagePickerController
 //
-//  Created by luo fengyuan on 2019/6/28.
+//  Created by hao shuai on 2019/6/28.
 //  Copyright © 2019 luo fengyuan. All rights reserved.
 //
 

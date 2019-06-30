@@ -27,8 +27,8 @@ class ViewController: UIViewController {
     
     @objc func buttonAction() {
         
-        let nvc = XOImagePickerController.init()
-        nvc.showTakePhotoButton = true
+        let nvc = XOImagePickerController()
+//        nvc.showTakePhotoButton = true
         self.present(nvc, animated: true, completion: nil)
     }
 
