@@ -320,8 +320,10 @@ extension XOVideoPreviewCell {
                 self._progressView.progress = Float(progress)
             }
         }
+        var _playerItem: AVPlayerItem?
         PHImageManager.default().requestPlayerItem(forVideo: asset, options: options) { [weak self] (playerItem, info) in
-            guard let item = playerItem else {
+            _playerItem = playerItem
+            guard let item = _playerItem else {
                 return
             }
             DispatchQueue.main.async {
@@ -366,7 +368,6 @@ extension XOVideoPreviewCell {
                 currentItem.seek(to: CMTime(seconds: 0, preferredTimescale: 1))
             }
             player.play()
-//            _playButton.isHidden = true
             _playButton.setImage(nil, for: UIControl.State.normal)
             if #available(iOS 9.0,*) {
 
@@ -382,7 +383,9 @@ extension XOVideoPreviewCell {
     
     @objc
     func __photoPreviewCollectionViewDidScroll() {
+        debugPrint("滑动")
         if let player = _player, player.rate != 0.0 {
+            debugPrint("滑动1")
             __pausePlayerAndShowNaviBar()
         }
     }

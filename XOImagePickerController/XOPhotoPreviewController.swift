@@ -40,7 +40,6 @@ class XOPhotoPreviewController: UIViewController {
         super.viewDidLoad()
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
-        
         self.view.addSubview(_collectionView)
         _collectionView.register(XOPhotoPreviewCell.self, forCellWithReuseIdentifier: "XOPhotoPreviewCell")
         _collectionView.register(XOVideoPreviewCell.self, forCellWithReuseIdentifier: "XOVideoPreviewCell")
@@ -212,7 +211,8 @@ extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionView
 }
 
 extension XOPhotoPreviewController {
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
+//    scrollViewDidScroll
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let width: CGFloat
         if #available(iOS 11.0, *) {
             width = view.bounds.inset(by: view.safeAreaInsets).width
@@ -220,13 +220,14 @@ extension XOPhotoPreviewController {
             width = view.bounds.width
         }
         var offSetWidth = scrollView.contentOffset.x;
-        offSetWidth = offSetWidth +  ((width + 20) * 0.5);
-//
+        offSetWidth = offSetWidth + ((width + 20) * 0.5);
+        //
         let currentIndex:Int = Int(offSetWidth / (width + 20));
         if currentIndex < self.fetchResult.count && self.currentIndex != currentIndex {
             self.currentIndex = currentIndex
             __refreshNaviBarAndBottomBarState()
         }
+        debugPrint("发送滑动")
         NotificationCenter.default.post(name: NSNotification.Name.XOKit.PhotoPreviewCollectionViewDidScroll, object: nil)
     }
 }
