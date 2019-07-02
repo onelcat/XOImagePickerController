@@ -9,10 +9,10 @@
 import Foundation
 
 extension UIImage {
-    convenience init?(XOKit name: String) {
+    convenience init?(XOKit named: String) {
         let bundle = Bundle.XOKit()
         print(bundle)
-        self.init(named: name,in: bundle, compatibleWith: nil)
+        self.init(named: named,in: bundle, compatibleWith: nil)
     }
     
 }
