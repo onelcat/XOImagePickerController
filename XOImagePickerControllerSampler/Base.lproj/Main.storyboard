@@ -22,7 +22,19 @@
                                 <rect key="frame" x="0.0" y="818" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
-                                    <barButtonItem title="Item" id="qFd-pN-ywY"/>
+                                    <barButtonItem title="预览" id="6E5-zz-e9l"/>
+                                    <barButtonItem title="原图" image="MMVideoPreviewPlay.png" style="done" id="pRY-iI-t8G">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="Ozg-RZ-a0g">
+                                            <rect key="frame" x="66" y="4" width="54" height="36"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="17"/>
+                                            <state key="normal" title="原图">
+                                                <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </state>
+                                        </button>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="JXt-eB-i8K"/>
+                                    <barButtonItem title="完成(1)" width="42" style="plain" id="EcA-6b-v52"/>
                                 </items>
                             </toolbar>
                         </subviews>
@@ -32,6 +44,10 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="34.782608695652179" y="18.75"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="MMVideoPreviewPlay.png" width="85" height="85"/>
+    </resources>
 </document>

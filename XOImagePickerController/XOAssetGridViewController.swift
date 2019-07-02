@@ -20,7 +20,7 @@ class XOAssetGridViewController: UICollectionViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!
     var assetCollection: PHAssetCollection!
-    var availableWidth: CGFloat = 0
+    private var _availableWidth: CGFloat = 0
     
     lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -30,6 +30,31 @@ class XOAssetGridViewController: UICollectionViewController {
     fileprivate let imageManager = PHCachingImageManager()
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect = CGRect.zero
+    
+    private var _previewButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        button.setTitle("预览", for: .normal)
+        return button
+    }()
+    
+    private var _selectOriginalImageButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        button.setTitle("原图", for: .normal)
+        return button
+    }()
+
+    private var _completeButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        button.setTitle("完成", for: .normal)
+        return button
+    }()
+    
+    fileprivate var _toolBar: UIToolbar = {
+        let toolbar = UIToolbar(frame: CGRect.zero)
+        
+
+        return toolbar
+    }()
     
     fileprivate var __configInfo: XOImagePickerController {
         return self.navigationController as! XOImagePickerController
@@ -62,9 +87,16 @@ class XOAssetGridViewController: UICollectionViewController {
             self.collectionView.contentInsetAdjustmentBehavior = .always
         } else {
             // Fallback on earlier versions
+//            self.automaticallyAdjustsScrollViewInsets = false
         }
         self.collectionView.alwaysBounceHorizontal = false
-
+        
+        let button0 = UIBarButtonItem(customView: self._previewButton)
+        let button1 = UIBarButtonItem(customView: self._selectOriginalImageButton)
+        let button2 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let button3 = UIBarButtonItem(customView: self._completeButton)
+        _toolBar.setItems([button0,button1,button2,button3], animated: false)
+        self.view.addSubview(_toolBar)
         resetCachedAssets()
         PHPhotoLibrary.shared().register(self)
         collectionView.register(XOGridViewCell.self, forCellWithReuseIdentifier: "XOGridViewCell")
@@ -86,21 +118,25 @@ class XOAssetGridViewController: UICollectionViewController {
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         let width: CGFloat
+        let y: CGFloat
         if #available(iOS 11.0, *) {
             width = view.bounds.inset(by: view.safeAreaInsets).width
+            y = view.bounds.height - view.safeAreaInsets.bottom - 44.0
         } else {
             // Fallback on earlier versions
             width = view.bounds.width
+            y = view.bounds.height - 40.0
         }
         // Adjust the item size if the available width has changed.
-        if availableWidth != width {
-            availableWidth = width
-            let columnCount = (availableWidth / 80).rounded(.towardZero)
-            let itemLength = (availableWidth - ((columnCount - 1) * 2)) / columnCount
+        if _availableWidth != width {
+            _availableWidth = width
+            let columnCount = (width / 80).rounded(.towardZero)
+            let itemLength = (width - ((columnCount - 1) * 2)) / columnCount
             collectionViewFlowLayout.itemSize = CGSize(width: itemLength, height: itemLength)
             collectionViewFlowLayout.minimumLineSpacing = 2
             collectionViewFlowLayout.minimumInteritemSpacing = 2
             collectionView.setCollectionViewLayout(collectionViewFlowLayout, animated: false)
+            _toolBar.frame = CGRect(x: 0, y: y, width: width, height: 44.0)
         }
     }
     
@@ -269,7 +305,6 @@ class XOAssetGridViewController: UICollectionViewController {
             if !success { debugPrint("Error creating the asset: \(String(describing: error))") }
         }
     }
-    
 }
 
 // MARK: PHPhotoLibraryChangeObserver
