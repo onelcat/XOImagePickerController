@@ -11,37 +11,41 @@ import PhotosUI
 class XOGridViewCell: UICollectionViewCell {
     
     private
-    lazy var imageView: UIImageView = {
+    lazy var _imageView: UIImageView = {
         let view = UIImageView()
         return view
     }()
     
     private
-    lazy var livePhotoBadgeImageView: UIImageView = {
+    lazy var _livePhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
         return view
     }()
     
     private
-    lazy var gifPhotoBadgeImageView: UIImageView = {
+    lazy var _gifPhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
         return view
     }()
     
     private
-    lazy var videoPhotoBadgeImageView: UIImageView = {
+    lazy var _videoPhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
+        view.image = _videoPhotoBadgeImage
         return view
     }()
     
     private
-    lazy var videoLabel: UILabel = {
+    lazy var _videoDurationLabel: UILabel = {
         let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12)
+        label.textColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        label.textAlignment = .left
         return label
     }()
     
     private
-    lazy var livePhotoBadgeImage: UIImage? = {
+    lazy var _livePhotoBadgeImage: UIImage? = {
         if #available(iOS 9.1, *) {
             let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
             return image
@@ -51,7 +55,7 @@ class XOGridViewCell: UICollectionViewCell {
     }()
     
     private
-    lazy var gifPhotoBadgeImage: UIImage? = {
+    lazy var _gifPhotoBadgeImage: UIImage? = {
         if #available(iOS 9.1, *) {
             let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
             return image
@@ -61,32 +65,51 @@ class XOGridViewCell: UICollectionViewCell {
     }()
     
     private
-    lazy var videoPhotoBadgeImage: UIImage? = {
-        if #available(iOS 9.1, *) {
-            let image = PHLivePhotoView.livePhotoBadgeImage(options: .overContent)
-            return image
-        } else {
-            return nil
-        }
+    lazy var _videoPhotoBadgeImage: UIImage? = {
+        return UIImage(XOKit: "VideoSendIcon")
     }()
     
     var representedAssetIdentifier: String!
     
     var thumbnailImage: UIImage! {
         didSet {
-            imageView.image = thumbnailImage
+            _imageView.image = thumbnailImage
         }
     }
     
-    var mediaType: MediaType = .image
+    var mediaType: MediaType = .image {
+        didSet {
+            switch self.mediaType {
+            case let .video(value):
+                let duration = Int(value)
+                contentView.addSubview(_videoPhotoBadgeImageView)
+                _videoDurationLabel.text = "\(duration)"
+                contentView.addSubview(_videoDurationLabel)
+            default:
+                break
+            }
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        imageView.frame = contentView.bounds
-        contentView.addSubview(imageView)
-        
-//        addSubview(imageView)
-//        imageView.frame = bounds
+        _imageView.frame = contentView.bounds
+        contentView.addSubview(_imageView)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        switch self.mediaType {
+        case .video(_):
+            let x:CGFloat = 4
+            let height = self.contentView.bounds.height
+            let width = self.contentView.bounds.width
+            let y: CGFloat = height - 25
+            _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
+            _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
+        default:
+            break
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -95,9 +118,9 @@ class XOGridViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageView.image = nil
-        gifPhotoBadgeImageView.image = nil
-        livePhotoBadgeImageView.image = nil
-        videoPhotoBadgeImageView.image = nil
+        _imageView.image = nil
+        _gifPhotoBadgeImageView.image = nil
+        _livePhotoBadgeImageView.image = nil
+        _videoPhotoBadgeImageView.image = nil
     }
 }

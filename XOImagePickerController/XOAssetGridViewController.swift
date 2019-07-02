@@ -21,7 +21,7 @@ class XOAssetGridViewController: UICollectionViewController {
     var fetchResult: PHFetchResult<PHAsset>!
     var assetCollection: PHAssetCollection!
     private var _availableWidth: CGFloat = 0
-    
+    private var _safeAreaBottom: CGFloat = 0
     lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
         return layout
@@ -31,29 +31,29 @@ class XOAssetGridViewController: UICollectionViewController {
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect = CGRect.zero
     
-    private var _previewButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.custom)
-        button.setTitle("预览", for: .normal)
-        return button
-    }()
+//    private var _previewButton: UIButton = {
+//        let button = UIButton(type: UIButton.ButtonType.custom)
+//        button.setTitle("预览", for: .normal)
+//        return button
+//    }()
+//
+//    private var _selectOriginalImageButton: UIButton = {
+//        let button = UIButton(type: UIButton.ButtonType.custom)
+//        button.setTitle("原图", for: .normal)
+//        return button
+//    }()
+//
+//    private var _completeButton: UIButton = {
+//        let button = UIButton(type: UIButton.ButtonType.custom)
+//        button.setTitle("完成", for: .normal)
+//        return button
+//    }()
     
-    private var _selectOriginalImageButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.custom)
-        button.setTitle("原图", for: .normal)
-        return button
-    }()
 
-    private var _completeButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.custom)
-        button.setTitle("完成", for: .normal)
-        return button
-    }()
     
-    fileprivate var _toolBar: UIToolbar = {
-        let toolbar = UIToolbar(frame: CGRect.zero)
-        
-
-        return toolbar
+    fileprivate var _toolView: XOToolView = {
+        let view = XOToolView()
+        return view
     }()
     
     fileprivate var __configInfo: XOImagePickerController {
@@ -83,6 +83,7 @@ class XOAssetGridViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+        self.collectionView.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
         if #available(iOS 11.0, *) {
             self.collectionView.contentInsetAdjustmentBehavior = .always
         } else {
@@ -91,12 +92,7 @@ class XOAssetGridViewController: UICollectionViewController {
         }
         self.collectionView.alwaysBounceHorizontal = false
         
-        let button0 = UIBarButtonItem(customView: self._previewButton)
-        let button1 = UIBarButtonItem(customView: self._selectOriginalImageButton)
-        let button2 = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let button3 = UIBarButtonItem(customView: self._completeButton)
-        _toolBar.setItems([button0,button1,button2,button3], animated: false)
-        self.view.addSubview(_toolBar)
+        self.view.addSubview(self._toolView)
         resetCachedAssets()
         PHPhotoLibrary.shared().register(self)
         collectionView.register(XOGridViewCell.self, forCellWithReuseIdentifier: "XOGridViewCell")
@@ -119,24 +115,30 @@ class XOAssetGridViewController: UICollectionViewController {
         super.viewWillLayoutSubviews()
         let width: CGFloat
         let y: CGFloat
+        let bottom: CGFloat
         if #available(iOS 11.0, *) {
             width = view.bounds.inset(by: view.safeAreaInsets).width
             y = view.bounds.height - view.safeAreaInsets.bottom - 44.0
+            bottom = view.safeAreaInsets.bottom
         } else {
             // Fallback on earlier versions
             width = view.bounds.width
             y = view.bounds.height - 40.0
+            bottom = 0
         }
         // Adjust the item size if the available width has changed.
         if _availableWidth != width {
+            _safeAreaBottom = bottom
             _availableWidth = width
             let columnCount = (width / 80).rounded(.towardZero)
             let itemLength = (width - ((columnCount - 1) * 2)) / columnCount
+            let toolViewHeight = 44.0 + bottom
+            collectionViewFlowLayout.footerReferenceSize = CGSize(width: _availableWidth, height: toolViewHeight)
             collectionViewFlowLayout.itemSize = CGSize(width: itemLength, height: itemLength)
             collectionViewFlowLayout.minimumLineSpacing = 2
             collectionViewFlowLayout.minimumInteritemSpacing = 2
             collectionView.setCollectionViewLayout(collectionViewFlowLayout, animated: false)
-            _toolBar.frame = CGRect(x: 0, y: y, width: width, height: 44.0)
+            _toolView.frame = CGRect(x: 0, y: y, width: width, height: 44.0 + bottom)
         }
     }
     
@@ -198,6 +200,8 @@ class XOAssetGridViewController: UICollectionViewController {
         cell.mediaType = mediaType
         return cell
     }
+    
+    
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         __pushPreviewController(indexPath: indexPath)
@@ -378,6 +382,7 @@ extension XOAssetGridViewController {
     func __presentImagePickerController() {
         let config = __configInfo
         let vc = UIImagePickerController()
+        vc.sourceType = config.sourceType // 必须要在其他属性之前
         vc.delegate = self
         vc.allowsEditing = config.allowsEditing
         vc.cameraFlashMode = config.cameraFlashMode
@@ -389,7 +394,8 @@ extension XOAssetGridViewController {
         } else {
             // Fallback on earlier versions
         }
-        vc.sourceType = config.sourceType
+        
+//        vc.sourceType = config.sourceType
         if #available(iOS 11.0, *) {
             vc.videoExportPreset = config.videoExportPreset.rawValue
         } else {
@@ -437,5 +443,6 @@ extension XOAssetGridViewController: UIImagePickerControllerDelegate,UINavigatio
         }
     }
 }
+
 
 

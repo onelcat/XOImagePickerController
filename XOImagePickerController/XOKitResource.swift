@@ -12,18 +12,7 @@ extension UIImage {
     convenience init?(XOKit name: String) {
         let bundle = Bundle.XOKit()
         print(bundle)
-        let exName = name + "@2x"
-        
-        guard let imagePath = bundle.path(forResource: exName, ofType: "png") else {
-            return nil
-        }
-        if FileManager.default.fileExists(atPath: imagePath) {
-            debugPrint("加载文件", imagePath)
-            self.init(contentsOfFile: imagePath)
-        } else {
-            debugPrint("加载本地图片")
-            self.init(named: name)
-        }
+        self.init(named: name,in: bundle, compatibleWith: nil)
     }
     
 }

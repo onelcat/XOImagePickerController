@@ -8,6 +8,10 @@
 
 import Foundation
 import PhotosUI
+import MobileCoreServices
+//import AssetsLibrary
+//import AVKit
+//import AVFoundation
 
 enum MediaType {
     case image
@@ -19,11 +23,11 @@ enum MediaType {
 
 open class XOImagePickerController: UINavigationController {
     
-    /// default value is UIImagePickerControllerSourceTypePhotoLibrary.
-    open var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    /// default value is UIImagePickerControllerSourceTypeCamera.
+    open var sourceType: UIImagePickerController.SourceType = .camera
     
     /// default value is an array containing kUTTypeImage.
-    open var mediaTypes: [String] = [""]
+    open var mediaTypes: [String] = [kUTTypeImage as String,kUTTypeVideo as String]
     
     /// replacement for -allowsImageEditing; default value is NO.
     open var allowsEditing: Bool = false
@@ -81,6 +85,7 @@ open class XOImagePickerController: UINavigationController {
     open var sortAscendingByModificationDate = true
     
     public init() {
+//        let a = kUTTypeMovie
         let vc = XOAssetGridViewController()
         super.init(rootViewController: vc)
     }

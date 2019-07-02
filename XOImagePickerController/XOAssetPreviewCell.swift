@@ -383,9 +383,7 @@ extension XOVideoPreviewCell {
     
     @objc
     func __photoPreviewCollectionViewDidScroll() {
-        debugPrint("滑动")
         if let player = _player, player.rate != 0.0 {
-            debugPrint("滑动1")
             __pausePlayerAndShowNaviBar()
         }
     }

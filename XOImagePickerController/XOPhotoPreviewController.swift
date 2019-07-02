@@ -227,7 +227,6 @@ extension XOPhotoPreviewController {
             self.currentIndex = currentIndex
             __refreshNaviBarAndBottomBarState()
         }
-        debugPrint("发送滑动")
         NotificationCenter.default.post(name: NSNotification.Name.XOKit.PhotoPreviewCollectionViewDidScroll, object: nil)
     }
 }
