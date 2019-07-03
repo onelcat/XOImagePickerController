@@ -31,7 +31,7 @@ class XOGridViewCell: UICollectionViewCell {
     private
     lazy var _videoPhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
-        view.image = _videoPhotoBadgeImage
+        view.image = videoPhotoBadgeImage
         return view
     }()
     
@@ -64,10 +64,7 @@ class XOGridViewCell: UICollectionViewCell {
         }
     }()
     
-    private
-    lazy var _videoPhotoBadgeImage: UIImage? = {
-        return UIImage(XOKit: "VideoSendIcon")
-    }()
+    var videoPhotoBadgeImage: UIImage?
     
     var representedAssetIdentifier: String!
     
@@ -81,11 +78,13 @@ class XOGridViewCell: UICollectionViewCell {
         didSet {
             switch self.mediaType {
             case let .video(value):
-                let duration = Int(value)
-                contentView.addSubview(_videoPhotoBadgeImageView)
-                _videoDurationLabel.text = "\(duration)"
-                contentView.addSubview(_videoDurationLabel)
+                _videoPhotoBadgeImageView.image = videoPhotoBadgeImage
+                _videoDurationLabel.text = XOHelper.formatSecond(Int(value))
+                _videoPhotoBadgeImageView.isHidden = false
+                _videoDurationLabel.isHidden = false
             default:
+                _videoPhotoBadgeImageView.isHidden = true
+                _videoDurationLabel.isHidden = true
                 break
             }
         }
@@ -95,21 +94,29 @@ class XOGridViewCell: UICollectionViewCell {
         super.init(frame: frame)
         _imageView.frame = contentView.bounds
         contentView.addSubview(_imageView)
+        contentView.addSubview(_videoPhotoBadgeImageView)
+        contentView.addSubview(_videoDurationLabel)
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        switch self.mediaType {
-        case .video(_):
-            let x:CGFloat = 4
-            let height = self.contentView.bounds.height
-            let width = self.contentView.bounds.width
-            let y: CGFloat = height - 25
-            _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
-            _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
-        default:
-            break
-        }
+        let x:CGFloat = 4
+        let height = self.contentView.bounds.height
+        let width = self.contentView.bounds.width
+        let y: CGFloat = height - 25
+        _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
+        _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
+//        switch self.mediaType {
+//        case .video(_):
+//            let x:CGFloat = 4
+//            let height = self.contentView.bounds.height
+//            let width = self.contentView.bounds.width
+//            let y: CGFloat = height - 25
+//            _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
+//            _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
+//        default:
+//            break
+//        }
     }
     
     required init?(coder aDecoder: NSCoder) {

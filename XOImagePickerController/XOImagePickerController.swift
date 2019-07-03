@@ -9,9 +9,6 @@
 import Foundation
 import PhotosUI
 import MobileCoreServices
-//import AssetsLibrary
-//import AVKit
-//import AVFoundation
 
 enum MediaType {
     case image
@@ -27,7 +24,7 @@ open class XOImagePickerController: UINavigationController {
     open var sourceType: UIImagePickerController.SourceType = .camera
     
     /// default value is an array containing kUTTypeImage.
-    open var mediaTypes: [String] = [kUTTypeImage as String,kUTTypeVideo as String]
+    open var mediaTypes: [String] = [kUTTypeImage as String,kUTTypeMovie as String]
     
     /// replacement for -allowsImageEditing; default value is NO.
     open var allowsEditing: Bool = false

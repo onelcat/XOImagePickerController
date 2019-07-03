@@ -31,40 +31,23 @@ class XOAssetGridViewController: UICollectionViewController {
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect = CGRect.zero
     
-//    private var _previewButton: UIButton = {
-//        let button = UIButton(type: UIButton.ButtonType.custom)
-//        button.setTitle("预览", for: .normal)
-//        return button
-//    }()
-//
-//    private var _selectOriginalImageButton: UIButton = {
-//        let button = UIButton(type: UIButton.ButtonType.custom)
-//        button.setTitle("原图", for: .normal)
-//        return button
-//    }()
-//
-//    private var _completeButton: UIButton = {
-//        let button = UIButton(type: UIButton.ButtonType.custom)
-//        button.setTitle("完成", for: .normal)
-//        return button
-//    }()
     
-
-    
-    fileprivate var _toolView: XOToolView = {
+    fileprivate
+    lazy var _toolView: XOToolView = {
         let view = XOToolView()
         return view
     }()
     
-    fileprivate var __configInfo: XOImagePickerController {
+    fileprivate var _videoPhotoBadgeImage: UIImage?
+    
+    fileprivate
+    lazy var __configInfo: XOImagePickerController = {
         return self.navigationController as! XOImagePickerController
-    }
+    }()
     
     init() {
-        
-        let width = UIScreen.main.bounds.width//view.bounds.inset(by: view.safeAreaInsets).width
-        // Adjust the item size if the available width has changed.
-//        availableWidth = width
+        _videoPhotoBadgeImage = UIImage(XOKit: "VideoSendIcon")
+        let width = UIScreen.main.bounds.width
         let columnCount = (width / 80).rounded(.towardZero)
         let itemLength = (width - ((columnCount - 1) * 2)) / columnCount
         let layout = UICollectionViewFlowLayout()
@@ -88,7 +71,7 @@ class XOAssetGridViewController: UICollectionViewController {
             self.collectionView.contentInsetAdjustmentBehavior = .always
         } else {
             // Fallback on earlier versions
-//            self.automaticallyAdjustsScrollViewInsets = false
+            self.automaticallyAdjustsScrollViewInsets = false
         }
         self.collectionView.alwaysBounceHorizontal = false
         
@@ -176,17 +159,23 @@ class XOAssetGridViewController: UICollectionViewController {
         // Dequeue a GridViewCell.
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOGridViewCell", for: indexPath) as? XOGridViewCell
             else { fatalError("Unexpected cell in collection view") }
+
         var mediaType: MediaType = .image
+        debugPrint("cell item", indexPath.item, asset.mediaType.rawValue , asset.mediaSubtypes.rawValue, asset.duration)
         // Add a badge to the cell if the PHAsset represents a Live Photo.
         if asset.mediaSubtypes.contains(.photoLive) {
             mediaType = .photoLive
         }
         else if asset.mediaType == .audio {
             mediaType = .audio(asset.duration)
+            
         }
         else if asset.mediaType == .video {
             mediaType = .video(asset.duration)
+            cell.videoPhotoBadgeImage = self._videoPhotoBadgeImage
         }
+        
+        cell.mediaType = mediaType
         
         // Request an image for the asset from the PHCachingImageManager.
         cell.representedAssetIdentifier = asset.localIdentifier
@@ -197,7 +186,6 @@ class XOAssetGridViewController: UICollectionViewController {
                 cell.thumbnailImage = image
             }
         })
-        cell.mediaType = mediaType
         return cell
     }
     

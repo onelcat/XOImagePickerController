@@ -29,6 +29,7 @@
 		08DC52D022C1C1950066C470 /* XOGridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08DC52CC22C1C1950066C470 /* XOGridViewCell.swift */; };
 		08EAF31D22C5C22300C67223 /* XOCameraCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08EAF31C22C5C22300C67223 /* XOCameraCell.swift */; };
 		602482E522CA5C2B00D14AA3 /* XOToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602482E422CA5C2B00D14AA3 /* XOToolView.swift */; };
+		602AC9CE22CCF8CB00DF5D2B /* XOHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 602AC9CD22CCF8CB00DF5D2B /* XOHelper.swift */; };
 		604FA53522C88C32000E33C1 /* photo_number_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA51C22C88C2F000E33C1 /* photo_number_icon@2x.png */; };
 		604FA53622C88C32000E33C1 /* zl_takeok@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA51D22C88C2F000E33C1 /* zl_takeok@2x.png */; };
 		604FA53722C88C32000E33C1 /* photo_sel_previewVc@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA51E22C88C2F000E33C1 /* photo_sel_previewVc@2x.png */; };
@@ -124,6 +125,7 @@
 		08DC52CC22C1C1950066C470 /* XOGridViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XOGridViewCell.swift; sourceTree = "<group>"; };
 		08EAF31C22C5C22300C67223 /* XOCameraCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XOCameraCell.swift; sourceTree = "<group>"; };
 		602482E422CA5C2B00D14AA3 /* XOToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XOToolView.swift; sourceTree = "<group>"; };
+		602AC9CD22CCF8CB00DF5D2B /* XOHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XOHelper.swift; sourceTree = "<group>"; };
 		604FA51622C88BFE000E33C1 /* XOKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XOKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		604FA51822C88BFF000E33C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		604FA51C22C88C2F000E33C1 /* photo_number_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "photo_number_icon@2x.png"; sourceTree = "<group>"; };
@@ -225,8 +227,8 @@
 				08DC528C22C1BF690066C470 /* Info.plist */,
 				08DC52C522C1BF970066C470 /* XOImagePickerController.swift */,
 				08DC52CB22C1C1940066C470 /* XOAssetGridViewController.swift */,
-				08DC52CA22C1C1940066C470 /* XOAssetViewController.swift */,
 				08DC52CC22C1C1950066C470 /* XOGridViewCell.swift */,
+				08DC52CA22C1C1940066C470 /* XOAssetViewController.swift */,
 				604FA54F22C88D16000E33C1 /* XOKit.bundle */,
 				08DC52C922C1C1940066C470 /* XOMasterViewController.swift */,
 				08EAF31C22C5C22300C67223 /* XOCameraCell.swift */,
@@ -236,6 +238,7 @@
 				087744C422C60C5D00D20B85 /* XOPhotoPreviewController.swift */,
 				087744C022C5EA2200D20B85 /* XOAssetPreviewCell.swift */,
 				602482E422CA5C2B00D14AA3 /* XOToolView.swift */,
+				602AC9CD22CCF8CB00DF5D2B /* XOHelper.swift */,
 			);
 			path = XOImagePickerController;
 			sourceTree = "<group>";
@@ -538,6 +541,7 @@
 				087744BF22C5CB6300D20B85 /* XOKitResource.swift in Sources */,
 				087744C122C5EA2200D20B85 /* XOAssetPreviewCell.swift in Sources */,
 				08DC52D022C1C1950066C470 /* XOGridViewCell.swift in Sources */,
+				602AC9CE22CCF8CB00DF5D2B /* XOHelper.swift in Sources */,
 				08DC52CD22C1C1950066C470 /* XOMasterViewController.swift in Sources */,
 				602482E522CA5C2B00D14AA3 /* XOToolView.swift in Sources */,
 				08DC52CE22C1C1950066C470 /* XOAssetViewController.swift in Sources */,
