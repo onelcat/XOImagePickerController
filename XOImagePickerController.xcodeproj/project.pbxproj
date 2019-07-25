@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08414C3922E9AEC50016D809 /* XOKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 08414C3822E9AEC50016D809 /* XOKit.bundle */; };
 		087744BD22C5C52600D20B85 /* Bundle+XOKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087744BC22C5C52600D20B85 /* Bundle+XOKit.swift */; };
 		087744BF22C5CB6300D20B85 /* XOKitResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087744BE22C5CB6300D20B85 /* XOKitResource.swift */; };
 		087744C122C5EA2200D20B85 /* XOAssetPreviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087744C022C5EA2200D20B85 /* XOAssetPreviewCell.swift */; };
@@ -55,7 +56,6 @@
 		604FA54B22C88C32000E33C1 /* MMVideoPreviewPlay@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA53222C88C31000E33C1 /* MMVideoPreviewPlay@2x.png */; };
 		604FA54C22C88C32000E33C1 /* zl_focus@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA53322C88C31000E33C1 /* zl_focus@3x.png */; };
 		604FA54D22C88C32000E33C1 /* zl_retake@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 604FA53422C88C32000E33C1 /* zl_retake@2x.png */; };
-		604FA55022C88D16000E33C1 /* XOKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 604FA54F22C88D16000E33C1 /* XOKit.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +97,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		08414C3822E9AEC50016D809 /* XOKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = XOKit.bundle; sourceTree = "<group>"; };
 		087744BC22C5C52600D20B85 /* Bundle+XOKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+XOKit.swift"; sourceTree = "<group>"; };
 		087744BE22C5CB6300D20B85 /* XOKitResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XOKitResource.swift; sourceTree = "<group>"; };
 		087744C022C5EA2200D20B85 /* XOAssetPreviewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XOAssetPreviewCell.swift; sourceTree = "<group>"; };
@@ -153,7 +154,6 @@
 		604FA53222C88C31000E33C1 /* MMVideoPreviewPlay@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MMVideoPreviewPlay@2x.png"; sourceTree = "<group>"; };
 		604FA53322C88C31000E33C1 /* zl_focus@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "zl_focus@3x.png"; sourceTree = "<group>"; };
 		604FA53422C88C32000E33C1 /* zl_retake@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "zl_retake@2x.png"; sourceTree = "<group>"; };
-		604FA54F22C88D16000E33C1 /* XOKit.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = XOKit.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,9 +236,9 @@
 				602482E422CA5C2B00D14AA3 /* XOToolView.swift */,
 				602AC9CD22CCF8CB00DF5D2B /* XOHelper.swift */,
 				087744BC22C5C52600D20B85 /* Bundle+XOKit.swift */,
-				604FA54F22C88D16000E33C1 /* XOKit.bundle */,
 				087744C222C5F5BD00D20B85 /* XOPHImageManager.swift */,
 				08DC52CA22C1C1940066C470 /* XOAssetViewController.swift */,
+				08414C3822E9AEC50016D809 /* XOKit.bundle */,
 			);
 			path = XOImagePickerController;
 			sourceTree = "<group>";
@@ -347,6 +347,7 @@
 				08DC529422C1BF7E0066C470 /* Frameworks */,
 				08DC529522C1BF7E0066C470 /* Resources */,
 				087744CA22C6177B00D20B85 /* Embed Frameworks */,
+				08414C3022E99CFF0016D809 /*  Integrate Lookin */,
 			);
 			buildRules = (
 			);
@@ -468,7 +469,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				604FA55022C88D16000E33C1 /* XOKit.bundle in Resources */,
+				08414C3922E9AEC50016D809 /* XOKit.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,6 +530,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		08414C3022E99CFF0016D809 /*  Integrate Lookin */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = " Integrate Lookin";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "FRAMEWORK_FILENAME=\"LookinServer.framework\"\nFRAMEWORK_WORKPATH=\"${CODESIGNING_FOLDER_PATH}/Frameworks\"\n\n# Define that LookinServer.framework is at the root directory of your Xcode project. If you want to move LookinServer.framework to a subdirectory named \"FavoriteFrameworks\", replace the line below with 'FRAMEWORK_PATH=\"${SRCROOT}/FavoriteFrameworks/${FRAMEWORK_FILENAME}\"', and add \"$(SRCROOT)/FavoriteFrameworks\" to \"Framework Search Paths\" in \"Build Settings\" tab. \n# 定义当前 LookinServer.framework 的文件位置位于项目根目录。请确保你确实已经把文件复制到了项目根目录（即和 .xcodeproj 文件处于同一个文件夹内）。如果你希望把 LookinServer.framework 放置到别的地方，比如项目根目录下一个叫 “FavoriteFrameworks” 的文件夹内，则请把下面这句改成 FRAMEWORK_PATH=\"${SRCROOT}/FavoriteFrameworks/${FRAMEWORK_FILENAME}\"，同时在 Build Settings 的 Framework Search Paths 里增加 “$(SRCROOT)/FavoriteFrameworks” \nFRAMEWORK_PATH=\"${SRCROOT}/${FRAMEWORK_FILENAME}\"\n\n# If configuration is not \"Debug\", do not integrate LookinServer.framework\n# 如果当前不是 Debug 模式则不植入 LookinServer.framework\n[ \"${CONFIGURATION}\" != \"Debug\" ] && exit 0\n\n# If you want to use Lookin both in \"Debug\" and another configuration(e.g. \"DailyTest\"), comment the line above and uncomment the line below. Be careful not to integrate LookinServer in \"Release\" configuration.\n# 如果你想同时在 Debug 模式和一个你自定义的叫 \"DailyTest\" 的模式下使用 Lookin，则请注释掉上面那句，同时解开下面这句的注释。再次提醒不要在 Release 模式下植入 LookinServer。\n# [ \"${CONFIGURATION}\" != \"Debug\" && \"${CONFIGURATION}\" != \"DailyTest\"] && exit 0\n\nmkdir -p \"${FRAMEWORK_WORKPATH}\"\n\nif [ -e \"${FRAMEWORK_PATH}\" ]; then\ncp -Rf \"$FRAMEWORK_PATH\" \"${FRAMEWORK_WORKPATH}/${FRAMEWORK_FILENAME}\"\nif [ -n \"${EXPANDED_CODE_SIGN_IDENTITY}\" ]; then\ncodesign -fs \"${EXPANDED_CODE_SIGN_IDENTITY}\" \"${FRAMEWORK_WORKPATH}/${FRAMEWORK_FILENAME}\"\nfi\necho \"LookinServer was integrated successfully.\"\nelse\necho \"Failed to integrate LookinServer. Because the framework could not be found at ${FRAMEWORK_PATH}.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		08DC528422C1BF690066C470 /* Sources */ = {
@@ -750,12 +772,13 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				INFOPLIST_FILE = XOImagePickerController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -766,6 +789,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = onelcat.github.io.XOImagePickerController;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -778,12 +802,13 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				INFOPLIST_FILE = XOImagePickerController/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -794,6 +819,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = onelcat.github.io.XOImagePickerController;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -807,11 +833,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				INFOPLIST_FILE = XOImagePickerControllerSampler/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-weak_framework",
+					LookinServer,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = onelcat.github.io.XOImagePickerControllerSampler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -827,6 +860,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				EMBED_ASSET_PACKS_IN_PRODUCT_BUNDLE = YES;
 				INFOPLIST_FILE = XOImagePickerControllerSampler/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -925,17 +959,21 @@
 		604FA51A22C88BFF000E33C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = G43963ZJC4;
+				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = XOKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = onelcat.github.io.XOKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
@@ -943,17 +981,21 @@
 		604FA51B22C88BFF000E33C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = G43963ZJC4;
+				DEVELOPMENT_TEAM = X3UY5TBH2C;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = XOKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_BUNDLE_IDENTIFIER = onelcat.github.io.XOKit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;

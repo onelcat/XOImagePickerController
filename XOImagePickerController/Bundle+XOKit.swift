@@ -16,7 +16,7 @@ extension Bundle {
             return bundle
         }
         
-        let bundle = Bundle(for: XOImagePickerController.classForCoder())
+        let bundle = Bundle(for: XOImagePickerController.self)
         guard let url = bundle.url(forResource: "XOKit", withExtension: "bundle") else {
             fatalError()
         }

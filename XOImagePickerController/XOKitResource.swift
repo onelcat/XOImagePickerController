@@ -13,7 +13,7 @@ extension UIImage {
     convenience init?(XOKit named: String) {
         let bundle = Bundle.XOKit()
         assert(bundle != nil)
-        debugPrint("bundle data", bundle ?? "错误")
+        debugPrint("bundle data", bundle ?? "XXXX", named)
         self.init(named: named,in: bundle, compatibleWith: nil)
     }
 }

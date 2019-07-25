@@ -57,7 +57,7 @@ class XOPhotoPreviewController: UIViewController {
             self.automaticallyAdjustsScrollViewInsets = false
         }
         self.view.clipsToBounds = true;
-        NotificationCenter.default.addObserver(self, selector: #selector(__didChangeStatusBarOrientationNotification(noti:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(__didChangeStatusBarOrientationNotification(_:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: _rightBarButton)
         // Do any additional setup after loading the view.
@@ -105,7 +105,6 @@ class XOPhotoPreviewController: UIViewController {
             _collectionView.contentSize = CGSize(width: CGFloat(count) * (width + 20.0), height: 0)
             _collectionView.frame = CGRect(x: -10, y: 0, width: width + 20, height: height)
             _collectionView.setCollectionViewLayout(_layout, animated: false)
-            
         }
     }
     
@@ -117,9 +116,14 @@ class XOPhotoPreviewController: UIViewController {
         }
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setToolbarHidden(true, animated: animated)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        self.navigationController?.setToolbarHidden(false, animated: animated)
+        
     }
     
     func prefersStatusBarHidden() -> Bool {
@@ -131,7 +135,7 @@ private
 extension XOPhotoPreviewController {
     
     @objc
-    func __didChangeStatusBarOrientationNotification(noti: Notification) {
+    func __didChangeStatusBarOrientationNotification(_ notification: Notification) {
         _offsetItemCount = _collectionView.contentOffset.x / _layout.itemSize.width;
     }
     
