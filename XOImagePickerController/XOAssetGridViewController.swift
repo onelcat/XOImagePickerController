@@ -9,6 +9,7 @@ import UIKit
 import Photos
 import PhotosUI
 import CoreLocation
+
 private extension UICollectionView {
     func indexPathsForElements(in rect: CGRect) -> [IndexPath] {
         let allLayoutAttributes = collectionViewLayout.layoutAttributesForElements(in: rect)!
@@ -27,6 +28,7 @@ class XOAssetGridViewController: UICollectionViewController {
         return layout
     }()
     
+    // CachingImage
     fileprivate let imageManager = PHCachingImageManager()
     fileprivate var thumbnailSize: CGSize!
     fileprivate var previousPreheatRect = CGRect.zero
@@ -40,20 +42,32 @@ class XOAssetGridViewController: UICollectionViewController {
     
     fileprivate var _videoPhotoBadgeImage: UIImage?
     
+    fileprivate var _photoDefImage: UIImage?
+    
+    fileprivate var _photoSelImage: UIImage?
+    
+//    fileprivate var _photoSelectButtonImage: (UIImage?,UIImage?)!
+    
     fileprivate
     lazy var __configInfo: XOImagePickerController = {
         return self.navigationController as! XOImagePickerController
     }()
     
     init() {
+        let itemSize: CGSize = CGSize(width: 80, height: 80)
+        let itemSpacing:CGFloat = 2.0
+        
         _videoPhotoBadgeImage = UIImage(XOKit: "VideoSendIcon")
+        _photoDefImage = UIImage(XOKit: "photo_original_def")
+        _photoSelImage = UIImage(XOKit: "photo_original_sel")
+        
         let width = UIScreen.main.bounds.width
-        let columnCount = (width / 80).rounded(.towardZero)
-        let itemLength = (width - ((columnCount - 1) * 2)) / columnCount
+        let columnCount = (width / itemSize.width).rounded(.towardZero)
+        let itemLength = (width - ((columnCount - 1) * itemSpacing)) / columnCount
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: itemLength, height: itemLength)
-        layout.minimumInteritemSpacing = 2
-        layout.minimumLineSpacing = 2
+        layout.minimumInteritemSpacing = itemSpacing
+        layout.minimumLineSpacing = itemSpacing
         super.init(collectionViewLayout: layout)
     }
     
@@ -78,8 +92,10 @@ class XOAssetGridViewController: UICollectionViewController {
         self.view.addSubview(self._toolView)
         resetCachedAssets()
         PHPhotoLibrary.shared().register(self)
+        
         collectionView.register(XOGridViewCell.self, forCellWithReuseIdentifier: "XOGridViewCell")
-        collectionView.register(XOCameraCell.self, forCellWithReuseIdentifier: "XOCameraCell")
+//        collectionView.register(XOCameraCell.self, forCellWithReuseIdentifier: "XOCameraCell")
+
         // Reaching this point without a segue means that this AssetGridViewController
         // became visible at app launch. As such, match the behavior of the segue from
         // the default "All Photos" view.
@@ -88,6 +104,11 @@ class XOAssetGridViewController: UICollectionViewController {
             allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
             fetchResult = PHAsset.fetchAssets(with: allPhotosOptions)
         }
+        
+        _toolView.previewButton.addTarget(self, action: #selector(__buttonClicked(_:)), for: UIControl.Event.touchUpInside)
+        _toolView.selectOriginalImageButton.addTarget(self, action: #selector(__buttonClicked(_:)), for: UIControl.Event.touchUpInside)
+        _toolView.completeButton.addTarget(self, action: #selector(__buttonClicked(_:)), for: UIControl.Event.touchUpInside)
+        
     }
     
     deinit {
@@ -161,7 +182,7 @@ class XOAssetGridViewController: UICollectionViewController {
             else { fatalError("Unexpected cell in collection view") }
 
         var mediaType: MediaType = .image
-        debugPrint("cell item", indexPath.item, asset.mediaType.rawValue , asset.mediaSubtypes.rawValue, asset.duration)
+//        debugPrint("cell item", indexPath.item, asset.mediaType.rawValue , asset.mediaSubtypes.rawValue, asset.duration)
         // Add a badge to the cell if the PHAsset represents a Live Photo.
         if asset.mediaSubtypes.contains(.photoLive) {
             mediaType = .photoLive
@@ -177,8 +198,15 @@ class XOAssetGridViewController: UICollectionViewController {
         
         cell.mediaType = mediaType
         
+        cell.selectPhotoButton.setImage(_photoDefImage, for: .normal)
+        cell.selectPhotoButton.setImage(_photoSelImage, for: .selected)
+        
         // Request an image for the asset from the PHCachingImageManager.
         cell.representedAssetIdentifier = asset.localIdentifier
+        cell.asset = asset
+        
+        let selectAsset = self.__configInfo.selectAsset
+        cell.selectPhotoButton.isSelected = selectAsset.contains(asset)
         imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
             // UIKit may have recycled this cell by the handler's activation time.
             // Set the cell's thumbnail image only if it's still showing the same asset.
@@ -186,13 +214,48 @@ class XOAssetGridViewController: UICollectionViewController {
                 cell.thumbnailImage = image
             }
         })
+        
+        weak var weakCell = cell
+        weakCell?.didSelectPhotoBlock = { [weak self] (isSelected) in
+            guard let config = self?.__configInfo, let _ = weakCell?.representedAssetIdentifier,let asset = weakCell?.asset  else {
+                return
+            }
+            
+            if isSelected {
+                // cancel select
+                weakCell?.selectPhotoButton.isSelected = false
+                config.selectAsset.removeAll(where: { (item) -> Bool in
+                    return asset == item
+                })
+            } else {
+                // select:check if over the maxImagesCount
+                if config.maxImagesCount > config.selectAsset.count {
+                    // 判断视频选择
+                    weakCell?.selectPhotoButton.isSelected = true
+                    config.selectAsset.append(asset)
+                } else {
+                    // 提示最大数量
+                    debugPrint("照片达到最大限制")
+                    return
+                }
+            }
+        }
         return cell
     }
     
     
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        __pushPreviewController(indexPath: indexPath)
+        let vc = XOPhotoPreviewController()
+        var fetchResult = [PHAsset]()
+        self.fetchResult.enumerateObjects { (asset, index, isStop) in
+            fetchResult.append(asset)
+        }
+        
+        vc.fetchResult = fetchResult
+        vc.assetCollection = self.assetCollection
+        vc.currentIndex = indexPath.item
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     
@@ -202,11 +265,11 @@ class XOAssetGridViewController: UICollectionViewController {
     }
     
     // MARK: Asset Caching
-    
     fileprivate func resetCachedAssets() {
         imageManager.stopCachingImagesForAllAssets()
         previousPreheatRect = .zero
     }
+    
     /// - Tag: UpdateAssets
     fileprivate func updateCachedAssets() {
         // Update only if the view is visible.
@@ -297,6 +360,34 @@ class XOAssetGridViewController: UICollectionViewController {
             if !success { debugPrint("Error creating the asset: \(String(describing: error))") }
         }
     }
+    
+    @objc private
+    func __buttonClicked(_ sender: UIButton?) {
+        guard let button = sender else {
+            return
+        }
+        
+        
+        if button == _toolView.previewButton {
+            let configInfo = __configInfo
+            guard configInfo.selectAsset.count > 0 else {
+                // TODO: 提示没有选择
+                return
+            }
+            
+            let vc = XOPhotoPreviewController()
+            vc.fetchResult = configInfo.selectAsset
+            vc.currentIndex = 0
+            self.navigationController?.pushViewController(vc, animated: true)
+            
+        }
+        else if button == _toolView.selectOriginalImageButton {
+            
+        }
+        else if button == _toolView.completeButton {
+            self.dismiss(animated: true) { }
+        }
+    }
 }
 
 // MARK: PHPhotoLibraryChangeObserver
@@ -371,19 +462,20 @@ extension XOAssetGridViewController {
         let config = __configInfo
         let vc = UIImagePickerController()
         vc.sourceType = config.sourceType // 必须要在其他属性之前
+        
         vc.delegate = self
         vc.allowsEditing = config.allowsEditing
         vc.cameraFlashMode = config.cameraFlashMode
         vc.cameraCaptureMode = config.cameraCaptureMode
         vc.cameraDevice = config.cameraDevice
         vc.mediaTypes = config.mediaTypes
+        
         if #available(iOS 11.0, *) {
             vc.imageExportPreset = config.imageExportPreset
         } else {
             // Fallback on earlier versions
         }
         
-//        vc.sourceType = config.sourceType
         if #available(iOS 11.0, *) {
             vc.videoExportPreset = config.videoExportPreset.rawValue
         } else {
@@ -394,16 +486,14 @@ extension XOAssetGridViewController {
         self.present(vc, animated: true, completion: nil)
     }
     
-    func __pushPreviewController(indexPath: IndexPath) {
-        let vc = XOPhotoPreviewController()
-        vc.fetchResult = self.fetchResult
-        vc.assetCollection = self.assetCollection
-        vc.currentIndex = indexPath.item
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
+//    func __pushPreviewController(indexPath: IndexPath) {
+//
+//    }
 }
 
-extension XOAssetGridViewController: UIImagePickerControllerDelegate,UINavigationControllerDelegate {
+// MARK: UIImagePickerControllerDelegate
+extension XOAssetGridViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true) { picker.delegate = nil }
     }

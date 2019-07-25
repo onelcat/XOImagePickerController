@@ -12,7 +12,7 @@ import Photos
 final
 class XOPhotoPreviewController: UIViewController {
     
-    var fetchResult: PHFetchResult<PHAsset>!
+    var fetchResult: [PHAsset]!
     
     var assetCollection: PHAssetCollection!
     
@@ -36,6 +36,14 @@ class XOPhotoPreviewController: UIViewController {
         return view
     }()
     
+    private
+    lazy var _rightBarButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        button.setImage(UIImage(XOKit: "photo_def_photoPickerVc"), for: UIControl.State.normal)
+        button.setImage(UIImage(XOKit: "photo_sel_photoPickerVc"), for: UIControl.State.selected)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         _collectionView.dataSource = self;
@@ -50,6 +58,8 @@ class XOPhotoPreviewController: UIViewController {
         }
         self.view.clipsToBounds = true;
         NotificationCenter.default.addObserver(self, selector: #selector(__didChangeStatusBarOrientationNotification(noti:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: _rightBarButton)
         // Do any additional setup after loading the view.
     }
     
@@ -62,8 +72,8 @@ class XOPhotoPreviewController: UIViewController {
             // Fallback on earlier versions
             width = view.bounds.width
         }
-        self.navigationController?.setToolbarHidden(true, animated: true)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigationController?.setToolbarHidden(false, animated: true)
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
         if #available(iOS 9.0,*) {
             
         } else {
@@ -98,12 +108,18 @@ class XOPhotoPreviewController: UIViewController {
             
         }
     }
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if (_offsetItemCount > 0) {
             let offsetX = _offsetItemCount * _layout.itemSize.width;
             _collectionView.setContentOffset(CGPoint(x: offsetX, y: 0), animated: false)
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.navigationController?.setToolbarHidden(false, animated: animated)
     }
     
     func prefersStatusBarHidden() -> Bool {
@@ -122,9 +138,18 @@ extension XOPhotoPreviewController {
     func __didTapPreviewCell() {
         let isHideNaviBar = self.navigationController?.isNavigationBarHidden ?? false
         self.navigationController?.setNavigationBarHidden(!isHideNaviBar, animated: true)
+        self.navigationController?.setToolbarHidden(!isHideNaviBar, animated: true)
     }
     func __refreshNaviBarAndBottomBarState() {
-        
+        guard let config = self.navigationController as? XOImagePickerController else {
+            return
+        }
+        let asset = self.fetchResult[self.currentIndex]
+        if config.selectAsset.contains(asset) {
+            _rightBarButton.isSelected = true
+        } else {
+            _rightBarButton.isSelected = false
+        }
     }
 //    - (void)refreshNaviBarAndBottomBarState {
 //    TZImagePickerController *_tzImagePickerVc = (TZImagePickerController *)self.navigationController;
@@ -184,7 +209,7 @@ extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionView
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let asset = fetchResult.object(at: indexPath.item)
+        let asset = fetchResult[indexPath.item]
         if asset.mediaType == .image {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "XOPhotoPreviewCell", for: indexPath) as? XOPhotoPreviewCell else {
                 fatalError()

@@ -11,14 +11,6 @@ import Foundation
 fileprivate var XOKitBundle: Bundle?
 
 extension Bundle {
-//    lazy var XOKit: Bundle = {
-//        let bundle = Bundle(for: XOImagePickerController.classForCoder())
-//        guard let url = bundle.url(forResource: "XOKit", withExtension: "bundle") else {
-//            fatalError()
-//        }
-//        return Bundle(url: url)!
-//    }()
-    
     static func XOKit() -> Bundle? {
         if let bundle = XOKitBundle {
             return bundle

@@ -7,12 +7,13 @@
 //
 
 import Foundation
+import UIKit
 
 extension UIImage {
     convenience init?(XOKit named: String) {
         let bundle = Bundle.XOKit()
-        print(bundle)
+        assert(bundle != nil)
+        debugPrint("bundle data", bundle ?? "错误")
         self.init(named: named,in: bundle, compatibleWith: nil)
     }
-    
 }

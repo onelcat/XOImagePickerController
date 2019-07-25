@@ -16,12 +16,13 @@ class XOGridViewCell: UICollectionViewCell {
         return view
     }()
     
+    // 暂时不需要
     private
     lazy var _livePhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
         return view
     }()
-    
+    // 暂时不需要
     private
     lazy var _gifPhotoBadgeImageView: UIImageView = {
         let view = UIImageView()
@@ -64,9 +65,27 @@ class XOGridViewCell: UICollectionViewCell {
         }
     }()
     
+    
+    
+    lazy var selectPhotoButton: UIButton = {
+        let button = UIButton(type: UIButton.ButtonType.custom)
+        return button
+    }()
+    
+//    var selectButtonImage:(UIImage?,UIImage?)! {
+//        didSet {
+//            _selectButton.setImage(selectButtonImage.0, for: UIControl.State.normal)
+//            _selectButton.setImage(selectButtonImage.1, for: UIControl.State.selected)
+//        }
+//    }
+    
+    var asset: PHAsset?
+    
     var videoPhotoBadgeImage: UIImage?
     
     var representedAssetIdentifier: String!
+    
+    var didSelectPhotoBlock: ((Bool)->Void)?
     
     var thumbnailImage: UIImage! {
         didSet {
@@ -93,9 +112,11 @@ class XOGridViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         _imageView.frame = contentView.bounds
+        selectPhotoButton.addTarget(self, action: #selector(__selectPhotoButtonClick(_:)), for: .touchUpInside)
         contentView.addSubview(_imageView)
         contentView.addSubview(_videoPhotoBadgeImageView)
         contentView.addSubview(_videoDurationLabel)
+        contentView.addSubview(selectPhotoButton)
     }
     
     override func layoutSubviews() {
@@ -106,17 +127,8 @@ class XOGridViewCell: UICollectionViewCell {
         let y: CGFloat = height - 25
         _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
         _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
-//        switch self.mediaType {
-//        case .video(_):
-//            let x:CGFloat = 4
-//            let height = self.contentView.bounds.height
-//            let width = self.contentView.bounds.width
-//            let y: CGFloat = height - 25
-//            _videoPhotoBadgeImageView.frame = CGRect(x: x, y: y, width: 17, height: 17)
-//            _videoDurationLabel.frame = CGRect(x: 28, y: y, width: width - 28, height: 17)
-//        default:
-//            break
-//        }
+        
+        selectPhotoButton.frame = CGRect(x: width - 30 - 2, y: 2, width: 30, height: 30)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -129,5 +141,15 @@ class XOGridViewCell: UICollectionViewCell {
         _gifPhotoBadgeImageView.image = nil
         _livePhotoBadgeImageView.image = nil
         _videoPhotoBadgeImageView.image = nil
+    }
+}
+private
+extension XOGridViewCell {
+    @objc
+    func __selectPhotoButtonClick(_ sender: UIButton?) {
+        guard let button = sender,let hander = self.didSelectPhotoBlock else {
+            return
+        }
+        hander(button.isSelected)
     }
 }

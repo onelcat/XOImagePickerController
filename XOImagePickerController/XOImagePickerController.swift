@@ -81,8 +81,9 @@ open class XOImagePickerController: UINavigationController {
     
     open var sortAscendingByModificationDate = true
     
+    open var maxImagesCount: Int = 9
+    
     public init() {
-//        let a = kUTTypeMovie
         let vc = XOAssetGridViewController()
         super.init(rootViewController: vc)
     }
