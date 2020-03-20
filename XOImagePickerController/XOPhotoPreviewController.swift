@@ -18,6 +18,10 @@ class XOPhotoPreviewController: UIViewController {
     
     var currentIndex: Int = 0
     
+    var delegate: XOAssetGridViewControllerChanageAsset?
+    
+    private var changeSelelctIndex: Set<Int> = []
+    
     private var _offsetItemCount: CGFloat = 0
     private var _availableWidth: CGFloat = 0
     lazy private var _layout: UICollectionViewFlowLayout = {
@@ -58,7 +62,7 @@ class XOPhotoPreviewController: UIViewController {
         }
         self.view.clipsToBounds = true;
         NotificationCenter.default.addObserver(self, selector: #selector(__didChangeStatusBarOrientationNotification(_:)), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
-        
+        _rightBarButton.addTarget(self, action: #selector(self.__buttonClicked(_:)), for: UIControl.Event.touchUpInside)
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: _rightBarButton)
         // Do any additional setup after loading the view.
     }
@@ -118,6 +122,8 @@ class XOPhotoPreviewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        let indexs = self.changeSelelctIndex.sorted()
+        delegate?.chanageSelectStatus(indexs: indexs)
         self.navigationController?.setToolbarHidden(true, animated: animated)
     }
     
@@ -135,6 +141,34 @@ private
 extension XOPhotoPreviewController {
     
     @objc
+    func __buttonClicked(_ sender: UIButton?) {
+        guard let config = self.navigationController as? XOImagePickerController else {
+            return
+        }
+        let asset = self.fetchResult[self.currentIndex]
+        changeSelelctIndex.insert(self.currentIndex)
+        if config.selectAsset.contains(asset) {
+            // 清除
+            _rightBarButton.isSelected = false
+//            debugPrint("现在的数据",config.selectAsset.count)
+            for i in 0..<config.selectAsset.count {
+//                debugPrint("当前表亲啊", config.selectAsset.count,i)
+                if config.selectAsset[i] == asset {
+                    config.selectAsset.remove(at: i)
+//                    debugPrint("移除元素")
+                    return
+                }
+            }
+            
+        } else {
+            // 添加
+            config.selectAsset.append(asset)
+            _rightBarButton.isSelected = true
+        }
+    }
+    
+    
+    @objc
     func __didChangeStatusBarOrientationNotification(_ notification: Notification) {
         _offsetItemCount = _collectionView.contentOffset.x / _layout.itemSize.width;
     }
@@ -144,11 +178,13 @@ extension XOPhotoPreviewController {
         self.navigationController?.setNavigationBarHidden(!isHideNaviBar, animated: true)
         self.navigationController?.setToolbarHidden(!isHideNaviBar, animated: true)
     }
+    
     func __refreshNaviBarAndBottomBarState() {
         guard let config = self.navigationController as? XOImagePickerController else {
             return
         }
         let asset = self.fetchResult[self.currentIndex]
+        
         if config.selectAsset.contains(asset) {
             _rightBarButton.isSelected = true
         } else {

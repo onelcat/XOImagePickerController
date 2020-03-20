@@ -17,6 +17,10 @@ private extension UICollectionView {
     }
 }
 
+protocol XOAssetGridViewControllerChanageAsset {
+    func chanageSelectStatus(indexs:[Int])
+}
+
 class XOAssetGridViewController: UICollectionViewController {
     
     var fetchResult: PHFetchResult<PHAsset>!
@@ -251,7 +255,7 @@ class XOAssetGridViewController: UICollectionViewController {
         self.fetchResult.enumerateObjects { (asset, index, isStop) in
             fetchResult.append(asset)
         }
-        
+        vc.delegate = self
         vc.fetchResult = fetchResult
         vc.assetCollection = self.assetCollection
         vc.currentIndex = indexPath.item
@@ -523,4 +527,13 @@ extension XOAssetGridViewController: UIImagePickerControllerDelegate, UINavigati
 }
 
 
-
+extension XOAssetGridViewController: XOAssetGridViewControllerChanageAsset {
+    func chanageSelectStatus(indexs: [Int]) {
+        guard indexs.count > 0 else {
+            return
+        }
+        let indexPaths = indexs.map{ IndexPath(item: $0, section: 0)}
+        self.collectionView.reloadItems(at: indexPaths)
+    }
+    
+}
