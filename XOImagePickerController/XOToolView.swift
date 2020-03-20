@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 class XOToolView: UIView {
     private var _availableWidth: CGFloat = 0
     

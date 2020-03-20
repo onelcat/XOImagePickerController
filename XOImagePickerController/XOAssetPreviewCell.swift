@@ -8,7 +8,7 @@
 
 import Foundation
 import Photos
-
+import UIKit
 
 protocol XOAssetPreviewCell {
     var dataSource: PHAsset? { get set }

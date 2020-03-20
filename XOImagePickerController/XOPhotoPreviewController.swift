@@ -155,54 +155,6 @@ extension XOPhotoPreviewController {
             _rightBarButton.isSelected = false
         }
     }
-//    - (void)refreshNaviBarAndBottomBarState {
-//    TZImagePickerController *_tzImagePickerVc = (TZImagePickerController *)self.navigationController;
-//    TZAssetModel *model = _models[self.currentIndex];
-//    _selectButton.selected = model.isSelected;
-//    [self refreshSelectButtonImageViewContentMode];
-//    if (_selectButton.isSelected && _tzImagePickerVc.showSelectedIndex && _tzImagePickerVc.showSelectBtn) {
-//    NSString *index = [NSString stringWithFormat:@"%d", (int)([_tzImagePickerVc.selectedAssetIds indexOfObject:model.asset.localIdentifier] + 1)];
-//    _indexLabel.text = index;
-//    _indexLabel.hidden = NO;
-//    } else {
-//    _indexLabel.hidden = YES;
-//    }
-//    _numberLabel.text = [NSString stringWithFormat:@"%zd",_tzImagePickerVc.selectedModels.count];
-//    _numberImageView.hidden = (_tzImagePickerVc.selectedModels.count <= 0 || _isHideNaviBar || _isCropImage);
-//    _numberLabel.hidden = (_tzImagePickerVc.selectedModels.count <= 0 || _isHideNaviBar || _isCropImage);
-//
-//    _originalPhotoButton.selected = _isSelectOriginalPhoto;
-//    _originalPhotoLabel.hidden = !_originalPhotoButton.isSelected;
-//    if (_isSelectOriginalPhoto) [self showPhotoBytes];
-//
-//    // If is previewing video, hide original photo button
-//    // 如果正在预览的是视频，隐藏原图按钮
-//    if (!_isHideNaviBar) {
-//    if (model.type == TZAssetModelMediaTypeVideo) {
-//    _originalPhotoButton.hidden = YES;
-//    _originalPhotoLabel.hidden = YES;
-//    } else {
-//    _originalPhotoButton.hidden = NO;
-//    if (_isSelectOriginalPhoto)  _originalPhotoLabel.hidden = NO;
-//    }
-//    }
-//
-//    _doneButton.hidden = NO;
-//    _selectButton.hidden = !_tzImagePickerVc.showSelectBtn;
-//    // 让宽度/高度小于 最小可选照片尺寸 的图片不能选中
-//    if (![[TZImageManager manager] isPhotoSelectableWithAsset:model.asset]) {
-//    _numberLabel.hidden = YES;
-//    _numberImageView.hidden = YES;
-//    _selectButton.hidden = YES;
-//    _originalPhotoButton.hidden = YES;
-//    _originalPhotoLabel.hidden = YES;
-//    _doneButton.hidden = YES;
-//    }
-//
-//    if (_tzImagePickerVc.photoPreviewPageDidRefreshStateBlock) {
-//    _tzImagePickerVc.photoPreviewPageDidRefreshStateBlock(_collectionView, _naviBar, _backButton, _selectButton, _indexLabel, _toolBar, _originalPhotoButton, _originalPhotoLabel, _doneButton, _numberImageView, _numberLabel);
-//    }
-//    }
 }
 
 extension XOPhotoPreviewController: UICollectionViewDataSource, UICollectionViewDelegate {
