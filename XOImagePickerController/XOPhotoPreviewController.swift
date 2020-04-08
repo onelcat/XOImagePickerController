@@ -150,16 +150,12 @@ extension XOPhotoPreviewController {
         if config.selectAsset.contains(asset) {
             // 清除
             _rightBarButton.isSelected = false
-//            debugPrint("现在的数据",config.selectAsset.count)
             for i in 0..<config.selectAsset.count {
-//                debugPrint("当前表亲啊", config.selectAsset.count,i)
                 if config.selectAsset[i] == asset {
                     config.selectAsset.remove(at: i)
-//                    debugPrint("移除元素")
                     return
                 }
             }
-            
         } else {
             // 添加
             config.selectAsset.append(asset)
